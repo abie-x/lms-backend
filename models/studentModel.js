@@ -45,6 +45,11 @@ const feeDetailsSchema = new mongoose.Schema(
                     type: Number,
                     required: true
                 },
+                paidAmount: {
+                    type: Number,
+                    required: true,
+                    default: 0
+                },
                 isPaid: {
                     type: Boolean,
                     required: true,
@@ -85,11 +90,9 @@ const studentSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true
         },
         results: {
             type: String,
-            required: false
         },
         feeDetails: feeDetailsSchema,
         admissionCoordinator: {
@@ -98,11 +101,9 @@ const studentSchema = new mongoose.Schema(
         },
         examCentre: {
             type: String,
-            required: false
         },
         deleteRequested: {
             type: Boolean,
-            default: false
         }
     }
 )
@@ -122,7 +123,6 @@ const niosStudentSchema = new mongoose.Schema(
         },
         batch: {
             type: String,
-            required: true,
             enum: ['Science', 'Commerce', 'Humanities']
         },
         course: {
@@ -133,33 +133,61 @@ const niosStudentSchema = new mongoose.Schema(
         mode: {
             type: String,
             required: true,
-            enum: ['Online', 'Offline'] //add correspondent student in this enum..
+            enum: ['Online', 'Offline', 'Correspondent'] //add correspondent student in this enum..
+        },
+        branch: {
+            type: String,
+            required: true
         },
         referenceNumber: {
             type: String,
-            required: true
         },
         enrollmentNumber: {
             type: String,
-            required: true
         },
         status: {
             type: String,
-            required: false,
-            enum: ['Fail', 'Pass', 'Dropout', 'Other']
+            required: true,
+            default: 'Admitted',
+            enum: ['Fail', 'Pass', 'Dropout', 'Admitted', 'Other']
+        },
+        registrationStream: {
+            type: String,
+            enum: ['Stream1', 'Stream2', 'Stream3', 'Stream4']
+        },
+        examMode: {
+            type: String,
+            enum: ['Normal exam', 'Ondemand exam']
+        },
+        exaMonth: { 
+            type: String, //we might need to change the type to array of strings later. 
+            enum: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        },
+        lastExamYear: {
+            type: String,
+        },
+        onDemandExam: {
+            type: Boolean,
+            required: true,
+            default: false
         },
         onDemandExamMonth: { 
             type: String, //we might need to change the type to array of strings later. 
-            required: false,
             enum: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        },
+        onDemandSubjects: {
+            type: [String],
         },
         subjects: {
             type: [String],
-            required: true
         },
         toc: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        tocSubjects: {
             type: [String],
-            required: false
         }
     },
     {

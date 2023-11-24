@@ -11,25 +11,19 @@ const createNiosStudent = asyncHandler(async (req, res) => {
   const {
     name,
     place,
-    dob,
+    year,
+    course,
+    batch,
+    intake,
+    mode,
     phoneNumber,
     parentNumber,
+    dob,
     email,
-    password,
-    results,
-    admissionCoordinator,
-    course,
-    intake,
-    batch,
-    mode,
-    referenceNumber,
-    enrollmentNumber,
-    status,
-    onDemandExamMonth,
-    subjects,
-    toc,
-    year, // Include year in the request to check against NiosFee
+    branch,
+    admissionCoordinator
   } = req.body;
+
 
   //check if a student with the same email id exists
   const studentExist = await NiosStudent.findOne({phoneNumber})
@@ -40,50 +34,57 @@ const createNiosStudent = asyncHandler(async (req, res) => {
   }
 
   // Fetch NiosFee based on the provided intake, course, batch, and year
-    const niosFee = await NiosFee.findOne({
-        intake,
-        course,
-        batch,
-        year,
-        mode
-    });
+  const query = {
+    intake,
+    course,
+    year,
+    mode,
+  };
+
+  console.log(batch)
+
+  if (batch !== undefined && batch !== null && batch !== '') {
+    query.batch = batch;
+  }
+
+  console.log(query)
+
+    const niosFee = await NiosFee.findOne(query);
+
+    console.log(niosFee)
 
     if(niosFee) {
         const { installments, examFees, registrationFees, totalAmount } = niosFee
 
-        const niosStudent = await NiosStudent.create(
-            {
+        const studentQuery = {
                 name,
                 place,
-                dob,
-                phoneNumber,
-                parentNumber,
-                email,
-                password,
-                results,
-                admissionCoordinator,
                 year,
                 course,
                 intake,
-                batch,
                 mode,
-                referenceNumber,
-                enrollmentNumber,
-                status,
-                onDemandExamMonth,
-                subjects,
-                toc,
+                phoneNumber,
+                parentNumber,
+                dob,
+                email,
+                branch,
+                admissionCoordinator,
                 feeDetails: {
                     totalAmount,
                     registrationFees,
                     examFees,
                     installments,
                 },
-            }
-        )
+        }
+
+        if (batch !== undefined && batch !== null && batch !== '') {
+            studentQuery.batch = batch;
+          }
+
+        const niosStudent = await NiosStudent.create(studentQuery)
         res.status(201).send(niosStudent)
     } else {
-        res.status(404)
+        // res.status(404)
         throw new Error(`Nios fee doesnt found for the specific criteria`)
     }
 
@@ -176,19 +177,21 @@ const createNiosStudent = asyncHandler(async (req, res) => {
 
 //----------
 const niosFeePay = asyncHandler(async (req, res) => {
-    const { phoneNumber, email, feeType, installmentNumber } = req.body;
+    const { phoneNumber, feeType, installmentNumber, amount } = req.body;
+
+    console.log(phoneNumber)
+    console.log(feeType)
+    console.log(installmentNumber)
+    console.log(amount)
 
     // Find the student based on phoneNumber or email
     let student;
 
     if (phoneNumber) {
         student = await NiosStudent.findOne({ phoneNumber });
-    } else if (email) {
-        student = await NiosStudent.findOne({ email });
     }
 
     if (!student) {
-        res.status(404);
         throw new Error('Student not found');
     }
 
@@ -196,32 +199,36 @@ const niosFeePay = asyncHandler(async (req, res) => {
     const { intake, course, batch, year, mode } = student;
 
     // Determine the appropriate fees based on student's details
-    const niosFee = await NiosFee.findOne({
+    const feeQuery = {
         intake,
         course,
-        batch,
         year,
         mode
-    });
+    }
+
+    if (batch !== undefined && batch !== null && batch !== '') {
+        feeQuery.batch = batch;
+      }
+    const niosFee = await NiosFee.findOne(feeQuery);
+
+    console.log(`printing the NIOS fee`, niosFee)
 
     if (!niosFee) {
-        res.status(404);
         throw new Error('Unable to fetch NIOS fee for this student');
     }
 
     if (feeType === 'registrationFees') {
+        console.log('hey, iam part of registrationfee')
         if (student.feeDetails.registrationFeePaid) {
-            res.status(400);
             throw new Error('Registration fee already paid by the student');
         } else {
             student.feeDetails.registrationFeePaid = true;
-            const amount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
-            student.feeDetails.paidAmount += amount
+            const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
+            student.feeDetails.paidAmount += regFeeAmount
             createTransaction(student._id, amount, feeType); // Create a new transaction
         }
     } else if (feeType === 'examFees') {
         if (student.feeDetails.examFeePaid) {
-            res.status(400);
             throw new Error('Exam fee already paid by the student');
         } else {
             student.feeDetails.examFeePaid = true;
@@ -230,17 +237,29 @@ const niosFeePay = asyncHandler(async (req, res) => {
             createTransaction(student._id, amount, feeType); // Create a new transaction
         }
     } else {
+        console.log('hey theree!!')
         const installmentToPay = student.feeDetails.installments.find(
             (installment) => installment.installmentNumber === installmentNumber
         );
 
         if (installmentToPay) {
             if (installmentToPay.isPaid === true) {
-                res.status(400);
                 throw new Error('Student already paid this installment');
             } else {
-                installmentToPay.isPaid = true;
-                student.feeDetails.paidAmount += installmentToPay.amount;
+                // if(installmentToPay.amount === amount) {
+                //     installmentToPay.isPaid = true;
+                // }
+                console.log(installmentToPay)
+                let outstandingAmount = installmentToPay.amount - installmentToPay.paidAmount
+                console.log('outstanding amount', outstandingAmount)
+                if(outstandingAmount === amount) {
+                    installmentToPay.isPaid = true;
+                }
+                console.log('printing the paidAmount')
+                console.log(installmentToPay.paidAmount)
+                  
+                installmentToPay.paidAmount += amount;
+                student.feeDetails.paidAmount += amount;
                 createTransaction(student._id, installmentToPay.amount, feeType); // Create a new transaction
             }
         } else {
@@ -253,6 +272,7 @@ const niosFeePay = asyncHandler(async (req, res) => {
 
     res.status(200).json({
         message: 'Fees added successfully',
+        status: 'success'
     });
 });
 
@@ -279,10 +299,52 @@ const getStudentDetails = asyncHandler(async (req, res) => {
     if(student) {
         res.status(200).send(student)
     } else {
-        res.status(400)
         throw new Error(`Student doesn't exists for this Phone Number`)
     }
 })
+
+//desc => fetch student data by id
+//route => /api/students/:id
+//access => public
+const fetchStudentDetailsById = asyncHandler(async (req, res) => {
+    const {id} = req.params
+
+    console.log(id)
+
+    const student = await NiosStudent.findById(id)
+
+    if(student) {
+        res.status(200).send(student)
+    } else {
+        throw new Error(`Student doesn't exist for the given id`)
+    }
+})
+
+//update an existing student
+//action plan: step1 => get the phonenumber from the student.
+//step2 => get the stream, exam mode, enrollment number and year of last exam
+//step3: add these details and modify the existing student details
+//step4: if success, send the response back to the customer
+const updateExistingStudent = asyncHandler(async (req, res) => {
+
+    const studentId = req.params.id
+    const { registrationStream, examMode, enrollmentNumber, lastExamYear } = req.body;
+    const student = await NiosStudent.findByIdAndUpdate(studentId, {
+        $set: {
+            registrationStream,
+            examMode,
+            enrollmentNumber,
+            lastExamYear,
+        }
+    }, { new: true });
+
+    if (student) {
+        res.status(200).send(student);
+    } else {
+        res.status(400).send('Student not found');
+    }
+});
+
 
 //desc => Update the details of a particular student
 //route => /api/students/:id
@@ -398,7 +460,9 @@ export {
     createNiosStudent,
     niosFeePay,
     getStudentDetails,
+    fetchStudentDetailsById,
     updateStudent,
     getStudentsWithUnpaidFees,
-    getStudentsCreatedToday
+    getStudentsCreatedToday,
+    updateExistingStudent,
 };

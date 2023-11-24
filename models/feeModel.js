@@ -13,8 +13,7 @@ const niosFeeSchema = new mongoose.Schema(
         },
         batch: {
             type: String,
-            required: true,
-            enum: ['Science', 'Commerce', 'Humanities']
+            enum: ['Science', 'Commerce', 'Humanities', null]
         },
         course: {
             type: String,
