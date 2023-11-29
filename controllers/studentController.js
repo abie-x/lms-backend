@@ -206,35 +206,42 @@ const niosFeePay = asyncHandler(async (req, res) => {
         mode
     }
 
+    
+
     if (batch !== undefined && batch !== null && batch !== '') {
         feeQuery.batch = batch;
       }
+
     const niosFee = await NiosFee.findOne(feeQuery);
 
-    console.log(`printing the NIOS fee`, niosFee)
 
     if (!niosFee) {
         throw new Error('Unable to fetch NIOS fee for this student');
     }
 
-    if (feeType === 'registrationFees') {
-        console.log('hey, iam part of registrationfee')
-        if (student.feeDetails.registrationFeePaid) {
-            throw new Error('Registration fee already paid by the student');
-        } else {
-            student.feeDetails.registrationFeePaid = true;
-            const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
-            student.feeDetails.paidAmount += regFeeAmount
-            createTransaction(student._id, amount, feeType); // Create a new transaction
-        }
-    } else if (feeType === 'examFees') {
+    if (feeType === 'examFees') {
+        console.log('iam part of exam fee payment')
+        console.log(feeType)
         if (student.feeDetails.examFeePaid) {
             throw new Error('Exam fee already paid by the student');
         } else {
+            console.log('iam the else condition')
             student.feeDetails.examFeePaid = true;
-            const amount = niosFee.examFees; // Get the exam fee amount from the fee schema
-            student.feeDetails.paidAmount += amount
-            createTransaction(student._id, amount, feeType); // Create a new transaction
+            const examFeeAmount = niosFee.examFees; // Get the exam fee amount from the fee schema
+            student.feeDetails.paidAmount += examFeeAmount
+            createTransaction(student._id, examFeeAmount, feeType); // Create a new transaction
+        }  
+    } else if (feeType === 'registrationFees') {
+        console.log('hey, iam part of registrationfee')
+        console.log(feeType)
+        if (student.feeDetails.registrationFeePaid) {
+            throw new Error('Registration fee already paid by the student');
+        } else {
+            console.log('iam the else condition')
+            student.feeDetails.registrationFeePaid = true;
+            const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
+            student.feeDetails.paidAmount += regFeeAmount
+            createTransaction(student._id, regFeeAmount, feeType); // Create a new transaction
         }
     } else {
         console.log('hey theree!!')
@@ -329,6 +336,10 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
 
     const studentId = req.params.id
     const { registrationStream, examMode, enrollmentNumber, lastExamYear } = req.body;
+    console.log(registrationStream)
+    console.log(examMode)
+    console.log(enrollmentNumber)
+    console.log(lastExamYear)
     const student = await NiosStudent.findByIdAndUpdate(studentId, {
         $set: {
             registrationStream,
@@ -337,6 +348,8 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
             lastExamYear,
         }
     }, { new: true });
+
+    console.log(student)
 
     if (student) {
         res.status(200).send(student);

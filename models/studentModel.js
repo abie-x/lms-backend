@@ -186,6 +186,14 @@ const niosStudentSchema = new mongoose.Schema(
             required: true,
             default: false
         },
+        optionalSubjectsExam: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        optionalSubjects: {
+            type: [String],
+        },
         tocSubjects: {
             type: [String],
         }
