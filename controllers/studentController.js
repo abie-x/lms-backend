@@ -335,17 +335,15 @@ const fetchStudentDetailsById = asyncHandler(async (req, res) => {
 const updateExistingStudent = asyncHandler(async (req, res) => {
 
     const studentId = req.params.id
-    const { registrationStream, examMode, enrollmentNumber, lastExamYear } = req.body;
-    console.log(registrationStream)
-    console.log(examMode)
-    console.log(enrollmentNumber)
-    console.log(lastExamYear)
+    const { registrationStream, examMode, enrollmentNumber, lastExamYear, examCentre } = req.body;
+
     const student = await NiosStudent.findByIdAndUpdate(studentId, {
         $set: {
             registrationStream,
             examMode,
             enrollmentNumber,
             lastExamYear,
+            examCentre
         }
     }, { new: true });
 
@@ -353,7 +351,7 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
 
     if (student) {
         res.status(200).send(student);
-    } else {
+    } else { 
         res.status(400).send('Student not found');
     }
 });
