@@ -2,6 +2,120 @@ import asyncHandler from 'express-async-handler';
 import { NiosStudent } from '../models/studentModel.js';
 import { NiosFee } from '../models/feeModel.js';
 import { Transaction } from '../models/transactionModel.js';
+import PDFDocument from 'pdfkit';
+import nodemailer from 'nodemailer';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
+
+async function buildPdf(dataCallback, endCallback) {
+    try {
+
+        const doc = new PDFDocument();
+
+        doc.fontSize(16);
+
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
+
+        const logoPath = path.join(__dirname, 'linfield-logo.png');// Replace with the actual path to your logo image
+        
+
+        doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
+
+        // Add 'INVOICE' in the top-right corner
+        doc.text('INVOICE', 450, 100, { align: 'right' });
+
+        // Set the font size for the rest of the content
+        doc.fontSize(12);
+
+        // Add left-aligned text
+        doc.text('Invoice Date:', 50, 130);
+        doc.text('Northland Academy', 50, 130,  { align: 'right' });
+        doc.text('Invoice No.:', 50, 150);
+        doc.text('Phone: 9567335361', 50, 150,  { align: 'right' });
+
+        const columnNames = ['Item No', 'Item Description', 'Quantity', 'Unit Price', 'Total Amount'];
+
+        // Set the initial position for the table
+        let yPosition = 200;
+
+        // Set cell width and height
+        const cellWidth = 100;
+        const cellHeight = 20;
+
+        // Add the table headers with borders
+        columnNames.forEach((columnName, index) => {
+        // Draw the cell with a border
+        doc.rect(50 + index * cellWidth, yPosition, cellWidth, cellHeight).stroke();
+        doc.text(columnName, 50 + index * cellWidth + 5, yPosition + 5, { bold: true });
+        });
+
+        // Add sample data
+        const sampleData = [
+        { itemNo: '001', itemDescription: 'Product A', quantity: 5, unitPrice: 10, totalAmount: 50 },
+        { itemNo: '002', itemDescription: 'Product B', quantity: 3, unitPrice: 15, totalAmount: 45 }
+        ];
+
+        // Set the position for the data rows
+        yPosition += cellHeight;
+
+        // Add the sample data to the table with borders
+        sampleData.forEach((data, rowIndex) => {
+            Object.values(data).forEach((value, columnIndex) => {
+                // Draw the cell with a border
+                doc.rect(50 + columnIndex * cellWidth, yPosition + rowIndex * cellHeight, cellWidth, cellHeight).stroke();
+                doc.text(value.toString(), 50 + columnIndex * cellWidth + 5, yPosition + rowIndex * cellHeight + 5);
+            });
+        });
+
+        // Return a promise to handle asynchronous PDF generation
+        const pdfBuffer = await new Promise((resolve) => {
+            const buffers = [];
+            doc.on('data', buffer => {
+                dataCallback && dataCallback(buffer); // Invoke the dataCallback if provided
+                buffers.push(buffer);
+            });
+            doc.on('end', () => {
+                resolve(Buffer.concat(buffers));
+                endCallback && endCallback(); // Invoke the endCallback if provided
+            });
+            doc.end();  // Trigger the 'end' event
+        });
+
+        // Create a Nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'abhiramzmenon@gmail.com',
+                pass: 'rsgwlnlrmsthvwqt'
+            }
+        });
+
+        // Setup email data with unicode symbols
+        const mailOptions = {
+            from: 'abhiramzmenon@gmail.com',
+            to: 'apespotdigital@gmail.com',
+            subject: 'Testing node mailer',
+            text: 'Please find the attached invoice.',
+            attachments: [
+                {
+                    filename: 'invoice.pdf',
+                    content: pdfBuffer,
+                    encoding: 'base64',
+                },
+            ],
+        };
+
+        // Send mail with defined transport object
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Message sent: %s', info.messageId);
+
+        console.log('Invoice sent successfully.');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
 // desc  => create a new NIOS student
 //route => /api/students/nios
@@ -82,7 +196,18 @@ const createNiosStudent = asyncHandler(async (req, res) => {
           }
 
         const niosStudent = await NiosStudent.create(studentQuery)
+
+        // const stream = res.writeHead(200, {
+        //     'Content-Type': 'application/pdf',
+        //     'Content-Disposition': 'attachment;filename=invoice.pdf'
+        // })
+        // res.write(niosStudent);
+        // await buildPdf(
+        //     (chunk) => stream.write(chunk),
+        //     () => stream.end()
+        // )
         res.status(201).send(niosStudent)
+        await buildPdf()
     } else {
         // res.status(404)
         throw new Error(`Nios fee doesnt found for the specific criteria`)
