@@ -16,13 +16,13 @@ async function buildPdf(dataCallback, endCallback) {
 
         doc.fontSize(16);
 
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = dirname(__filename);
+        // const __filename = fileURLToPath(import.meta.url);
+        // const __dirname = dirname(__filename);
 
-        const logoPath = path.join(__dirname, 'linfield-logo.png');// Replace with the actual path to your logo image
+        // const logoPath = path.join(__dirname, 'linfield-logo.png');// Replace with the actual path to your logo image
         
 
-        doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
+        // doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
 
         // Add 'INVOICE' in the top-right corner
         doc.text('INVOICE', 450, 100, { align: 'right' });
