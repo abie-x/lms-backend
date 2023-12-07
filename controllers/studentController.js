@@ -7,6 +7,7 @@ import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import fetch from 'node-fetch';
 
 async function buildPdf(dataCallback, endCallback) {
     console.log('hey, cool')
