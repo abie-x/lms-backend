@@ -31,7 +31,8 @@ async function buildPdf(dataCallback, endCallback) {
 
         async function downloadImage(url) {
             const response = await fetch(url);
-            const buffer = await response.arrayBuffer();
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
             return buffer;
         }
 
