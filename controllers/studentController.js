@@ -21,12 +21,24 @@ async function buildPdf(dataCallback, endCallback) {
 
         // const logoPath = path.join(__dirname, '..', 'linfield-logo.png');// Replace with the actual path to your logo image
         
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
+        // const __filename = fileURLToPath(import.meta.url);
+        // const __dirname = path.dirname(__filename);
         
-        const logoPath = path.join(process.cwd(), 'controllers', 'linfield-logo.png');
+        // const logoPath = path.join(process.cwd(), 'controllers', 'linfield-logo.png');
 
-        doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
+        const imageUrl = 'https://w7.pngwing.com/pngs/326/85/png-transparent-google-logo-google-text-trademark-logo.png'
+
+        async function downloadImage(url) {
+            const response = await fetch(url);
+            const buffer = await response.buffer();
+            return buffer;
+        }
+
+        const imageBuffer = await downloadImage(imageUrl);
+
+        doc.image(imageBuffer, 50, 20, { width: 100, align: 'center' });
+
+        // doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
 
 
         // Add 'INVOICE' in the top-right corner
