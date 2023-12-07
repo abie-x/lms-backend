@@ -24,7 +24,7 @@ async function buildPdf(dataCallback, endCallback) {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
         
-        const logoPath = path.join(__dirname, 'linfield-logo.png');
+        const logoPath = path.join(process.cwd(), 'controllers', 'linfield-logo.png');
 
         doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
 
