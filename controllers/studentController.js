@@ -9,6 +9,7 @@ import { dirname } from 'path';
 import path from 'path';
 
 async function buildPdf(dataCallback, endCallback) {
+    console.log('hey, cool')
     try {
 
         const doc = new PDFDocument();
