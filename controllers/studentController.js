@@ -19,37 +19,19 @@ async function buildPdf(dataCallback, endCallback) {
 
         doc.fontSize(16);
 
-        // const __filename = fileURLToPath(import.meta.url);
-        // const __dirname = dirname(__filename);
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = dirname(__filename);
 
-        // const logoPath = path.join(__dirname, '..', 'linfield-logo.png');// Replace with the actual path to your logo image
+        const logoPath = path.join(__dirname, '..', 'linfield-logo.png');// Replace with the actual path to your logo image
         
         // const __filename = fileURLToPath(import.meta.url);
         // const __dirname = path.dirname(__filename);
         
         // const logoPath = path.join(process.cwd(), 'controllers', 'linfield-logo.png');
 
-        const imageUrl = 'https://w7.pngwing.com/pngs/326/85/png-transparent-google-logo-google-text-trademark-logo.png'
-
-        async function downloadImage(url) {
-            const response = await fetch(url);
-            const buffer = await response.buffer();
-            return buffer;
-        }
-        
-
-        const imageBuffer = await downloadImage(imageUrl);
-
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
-
-        const tempImagePath = path.join(__dirname, 'tempImage.png');
-        fs.writeFileSync(tempImagePath, imageBuffer);
-
-        const { width, height } = imageSize(imageBuffer);
 
         
-        doc.image(tempImagePath, 50, 20, { width: 100, align: 'center' });
+        doc.image(logoPath, 50, 20, { width: 100, align: 'center' });
 
 
         // Add 'INVOICE' in the top-right corner
