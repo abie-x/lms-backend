@@ -40,6 +40,9 @@ async function buildPdf(dataCallback, endCallback) {
 
         const imageBuffer = await downloadImage(imageUrl);
 
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+
         const tempImagePath = path.join(__dirname, 'tempImage.png');
         fs.writeFileSync(tempImagePath, imageBuffer);
 
