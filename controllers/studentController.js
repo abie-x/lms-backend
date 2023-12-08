@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
 import fetch from 'node-fetch';
+import imageSize from 'image-size';
+import fs from 'fs';
 
 async function buildPdf(dataCallback, endCallback) {
     console.log('hey, cool')
@@ -31,15 +33,17 @@ async function buildPdf(dataCallback, endCallback) {
 
         async function downloadImage(url) {
             const response = await fetch(url);
-            const arrayBuffer = await response.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
+            const buffer = await response.buffer();
             return buffer;
         }
+        
 
         const imageBuffer = await downloadImage(imageUrl);
 
         const tempImagePath = path.join(__dirname, 'tempImage.png');
         fs.writeFileSync(tempImagePath, imageBuffer);
+
+        const { width, height } = imageSize(imageBuffer);
 
         
         doc.image(tempImagePath, 50, 20, { width: 100, align: 'center' });
