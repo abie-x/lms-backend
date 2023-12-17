@@ -10,86 +10,147 @@ import path from 'path';
 import fetch from 'node-fetch';
 import imageSize from 'image-size';
 import fs from 'fs';
+import { table } from 'console';
 
-async function buildPdf(dataCallback, endCallback) {
+async function buildPdf(name, course, batch, phoneNumber, email) {
     console.log('hey, cool')
+    console.log(email)
     try {
 
         const doc = new PDFDocument();
 
         doc.fontSize(16);
 
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
+        doc.image('images/test.png', 250, 0, {fit: [100, 100], align: 'center' })
+
+        
 
         // const logoPath = path.join(__dirname, '..', 'google-icon.svg');// Replace with the actual path to your logo image
         
         // const __filename = fileURLToPath(import.meta.url);
         // const __dirname = path.dirname(__filename);
         
-        const tempImagePath = path.join(__dirname, 'google-icon.svg');
+        
 
 
         
-        doc.image(tempImagePath, 50, 20, { width: 100, align: 'center' });
+        
 
 
         // Add 'INVOICE' in the top-right corner
-        doc.text('INVOICE', 450, 100, { align: 'right' });  
 
         // Set the font size for the rest of the content
         doc.fontSize(12);
 
         // Add left-aligned text
-        doc.text('Invoice Date:', 50, 130);
-        doc.text('Northland Academy', 50, 130,  { align: 'right' });
-        doc.text('Invoice No.:', 50, 150);
-        doc.text('Phone: 9567335361', 50, 150,  { align: 'right' });
+        // doc.text('Invoice Date:  22-08-2022', 50, 130);
+        // doc.fillColor('blue').text('Billed By', 50, 130, {align: 'right'})
+        // doc.fillColor('black')
+        // doc.font('Helvetica-Bold');
+        // doc.text('Linfield Eduverse', 50, 150,  { align: 'right', bold: true });
+        // doc.font('Helvetica');
+        // doc.text('Edappal road, Kumaranellur', 50, 170,  { align: 'right' });
+        // doc.text('kerala, 679534', 50, 190,  { align: 'right' });
+        // doc.text('9567335361', 50, 210,  { align: 'right' });
 
-        const columnNames = ['Item No', 'Item Description', 'Quantity', 'Unit Price', 'Total Amount'];
 
-        // Set the initial position for the table
-        let yPosition = 200;
+        // doc.fillColor('blue').text('Billed to', 50, 130)
+        // doc.fillColor('black')
+        // doc.text('Nihad Ahmed', 50, 150)
+        // doc.text('+2, Humanities', 50, 170)
+        // doc.text('nishadahmmed@gmail.com', 50, 190)
+        // doc.text('9567335361', 50, 210)
 
-        // Set cell width and height
-        const cellWidth = 100;
-        const cellHeight = 20;
+        doc.fontSize(12)
+        doc.text(`Hey ${name}!`, 40, 110)
+        doc.text(`A hearty welcome to the Linfield family! We're absolutely delighted to have you on board as a new member of our vibrant academic community.`, 40, 130)
+        doc.text(`Your educational journey with us is about to unfold, and we're committed to making it an experience filled with knowledge, growth, and memorable moments. As you set foot into the world of learning, we want to ensure that you have all the information you need regarding the fee structure for the upcoming academic session.`), 40, 150
 
-        // Add the table headers with borders
-        columnNames.forEach((columnName, index) => {
-        // Draw the cell with a border
-        doc.rect(50 + index * cellWidth, yPosition, cellWidth, cellHeight).stroke();
-        doc.text(columnName, 50 + index * cellWidth + 5, yPosition + 5, { bold: true });
-        });
+        
 
-        // Add sample data
-        const sampleData = [
-        { itemNo: '001', itemDescription: 'Product A', quantity: 5, unitPrice: 10, totalAmount: 50 },
-        { itemNo: '002', itemDescription: 'Product B', quantity: 3, unitPrice: 15, totalAmount: 45 }
-        ];
+        doc.strokeColor('blue');
+        const lineY = doc.y + 20
+        doc.moveTo(50, lineY).lineTo(550, lineY).stroke();
+        doc.strokeColor('black');
 
-        // Set the position for the data rows
-        yPosition += cellHeight;
+        const tableY = lineY + 30
+        doc.fontSize(12)
+        doc.fillColor('blue')
+        doc.text('Fee Type', 50, tableY, { align: 'left' });
+        doc.text('Payment Type', 200, tableY, { align: 'left' });
+        doc.text('Amount', 350, tableY, { align: 'left' });
+        doc.text('Payment ID', 450, tableY, { align: 'left' });
+        doc.fillColor('black')
 
-        // Add the sample data to the table with borders
-        sampleData.forEach((data, rowIndex) => {
-            Object.values(data).forEach((value, columnIndex) => {
-                // Draw the cell with a border
-                doc.rect(50 + columnIndex * cellWidth, yPosition + rowIndex * cellHeight, cellWidth, cellHeight).stroke();
-                doc.text(value.toString(), 50 + columnIndex * cellWidth + 5, yPosition + rowIndex * cellHeight + 5);
-            });
-        });
+        doc.fontSize(10)
+        doc.text('Registration Fees', 50, tableY + 20, { align: 'left' });
+        doc.text('Online', 220, tableY + 20, { align: 'left' });
+        doc.text('2000', 360, tableY + 20, { align: 'left' });
+        doc.text('X789123', 450, tableY + 20, { align: 'left' });
+        // doc.fillColor('blue').text('Course', 70, 220)
+        // doc.text('NIOS Humanities', 70, 240)
+
+        doc.strokeColor('gray')
+        doc.moveTo(50, tableY + 40).lineTo(550, tableY + 40).stroke();
+        doc.strokeColor('black');
+
+        doc.fontSize(12)
+        doc.fillColor('blue')
+        doc.text('Course Fee', 50, tableY + 60)
+        doc.text('Balance', 290, tableY + 60)
+        doc.fontSize(10)
+        doc.fillColor('black')
+        doc.text('7000', 60, tableY + 80)
+        doc.text('3900', 300, tableY + 80)
+
+        
+
+        // const columnNames = ['Item No', 'Item Description', 'Quantity', 'Unit Price', 'Total Amount'];
+
+        // // Set the initial position for the table
+        // let yPosition = 200;
+
+        // // Set cell width and height
+        // const cellWidth = 100;
+        // const cellHeight = 20;
+
+        // // Add the table headers with borders
+        // columnNames.forEach((columnName, index) => {
+        // // Draw the cell with a border
+        // doc.rect(50 + index * cellWidth, yPosition, cellWidth, cellHeight).stroke();
+        // doc.text(columnName, 50 + index * cellWidth + 5, yPosition + 5, { bold: true });
+        // });
+
+        // // Add sample data
+        // const sampleData = [
+        // { itemNo: '001', itemDescription: 'Product A', quantity: 5, unitPrice: 10, totalAmount: 50 },
+        // { itemNo: '002', itemDescription: 'Product B', quantity: 3, unitPrice: 15, totalAmount: 45 }
+        // ];
+
+        // // Set the position for the data rows
+        // yPosition += cellHeight;
+
+        // // Add the sample data to the table with borders
+        // sampleData.forEach((data, rowIndex) => {
+        //     Object.values(data).forEach((value, columnIndex) => {
+        //         // Draw the cell with a border
+        //         doc.rect(50 + columnIndex * cellWidth, yPosition + rowIndex * cellHeight, cellWidth, cellHeight).stroke();
+        //         doc.text(value.toString(), 50 + columnIndex * cellWidth + 5, yPosition + rowIndex * cellHeight + 5);
+        //     });
+        // });
+
+
 
         // Return a promise to handle asynchronous PDF generation
         const pdfBuffer = await new Promise((resolve) => {
             const buffers = [];
             doc.on('data', buffer => {
-                dataCallback && dataCallback(buffer); // Invoke the dataCallback if provided
+                //dataCallback && dataCallback(buffer); // Invoke the dataCallback if provided
                 buffers.push(buffer);
             });
             doc.on('end', () => {
                 resolve(Buffer.concat(buffers));
-                endCallback && endCallback(); // Invoke the endCallback if provided
+                //endCallback && endCallback(); // Invoke the endCallback if provided
             });
             doc.end();  // Trigger the 'end' event
         });
@@ -106,7 +167,7 @@ async function buildPdf(dataCallback, endCallback) {
         // Setup email data with unicode symbols
         const mailOptions = {
             from: 'abhiramzmenon@gmail.com',
-            to: 'apespotdigital@gmail.com',
+            to: email,
             subject: 'Testing node mailer',
             text: 'Please find the attached invoice.',
             attachments: [
@@ -218,7 +279,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
         //     () => stream.end()
         // )
         res.status(201).send(niosStudent)
-        await buildPdf()
+        await buildPdf(name, course, batch, phoneNumber, email)
     } else {
         // res.status(404)
         throw new Error(`Nios fee doesnt found for the specific criteria`)
