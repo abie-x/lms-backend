@@ -37,6 +37,22 @@ const niosFeeSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
+        admissionFees: {
+            type: Number,
+            required: true
+        },
+        admissionFeeDueDate: {
+            type: Date,
+            required: true
+        },
+        examFeeDueDate: {
+            type: Date,
+            required: true
+        },
+        registrationFeeDueDate: {
+            type: Date,
+            required: true
+        },
         installments: [
             {
                 installmentNumber: {

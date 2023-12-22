@@ -13,7 +13,11 @@ const registerNios = asyncHandler(async (req, res) => {
         course,
         mode,
         examFees,
+        examFeeDueDate,
         registrationFees,
+        registrationFeeDueDate,
+        admissionFees,
+        admissionFeeDueDate,
         totalAmount,
         installments,
       } = req.body;
@@ -25,7 +29,11 @@ const registerNios = asyncHandler(async (req, res) => {
         course,
         mode,
         examFees,
+        examFeeDueDate,
         registrationFees,
+        registrationFeeDueDate,
+        admissionFees,
+        admissionFeeDueDate,
         totalAmount,
         installments
     })
