@@ -39,190 +39,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
 
         try {
 
-            const doc = new PDFDocument();
-    
-            doc.fontSize(16);
-    
-            doc.image('images/test.png', 250, 0, {fit: [100, 100], align: 'center' })
-    
             
-    
-            // const logoPath = path.join(__dirname, '..', 'google-icon.svg');// Replace with the actual path to your logo image
-            
-            // const __filename = fileURLToPath(import.meta.url);
-            // const __dirname = path.dirname(__filename);
-            
-            
-    
-    
-            
-            
-    
-    
-            // Add 'INVOICE' in the top-right corner
-    
-            // Set the font size for the rest of the content
-            doc.fontSize(12);
-    
-            //Add left-aligned text
-            // doc.text('Invoice Date:  22-08-2022', 50, 130);
-            doc.fillColor('blue').text('Billed By', 50, 130, {align: 'right'})
-            doc.fillColor('black')
-            doc.font('Helvetica-Bold');
-            doc.text('Linfield Eduverse', 50, 150,  { align: 'right', bold: true });
-            doc.font('Helvetica');
-            doc.text('Edappal road, Kumaranellur', 50, 170,  { align: 'right' });
-            doc.text('kerala, 679534', 50, 190,  { align: 'right' });
-            doc.text('9567335361', 50, 210,  { align: 'right' });
-    
-    
-            doc.fillColor('blue').text('Billed to', 50, 130)
-            doc.fillColor('black')
-            doc.text(name, 50, 150)
-            doc.text(`${course} ${batch ? batch : ''} (${intake})`, 50, 170)
-            doc.text(email, 50, 190)
-            doc.text(phoneNumber, 50, 210)
-    
-            // doc.fontSize(12)
-            // doc.text(`Hey ${name}!`, 40, 110)
-            // doc.text(`A hearty welcome to the Linfield family! We're absolutely delighted to have you on board as a new member of our vibrant academic community.`, 40, 130)
-            // doc.text(`Your educational journey with us is about to unfold, and we're committed to making it an experience filled with knowledge, growth, and memorable moments. As you set foot into the world of learning, we want to ensure that you have all the information you need regarding the fee structure for the upcoming academic session.`), 40, 150
-    
-            
-    
-            doc.strokeColor('blue');
-            const lineY = doc.y + 20
-            doc.moveTo(50, lineY).lineTo(550, lineY).stroke();
-            doc.strokeColor('black');
-    
-            const tableY = lineY + 30
-            doc.fontSize(12)
-            doc.fillColor('blue')
-            // doc.text('Fee Type', 50, tableY, { align: 'left' });
-            // doc.text('Payment Type', 200, tableY, { align: 'left' });
-            // doc.text('Amount', 350, tableY, { align: 'left' });
-            // doc.text('Payment ID', 450, tableY, { align: 'left' });
-    
-            doc.text('Fee Type', 50, tableY)
-            doc.text('Amount', 275, tableY)
-            doc.text('Due date', 475, tableY)
-    
-            doc.fillColor('black')
-    
-            doc.text('Admission fees', 50, tableY + 20)
-            doc.text(admissionFees, 280, tableY + 20)
-            doc.text('Paid', 475, tableY + 20)
-    
-            doc.text('First Term fees', 50, tableY + 40)
-            doc.text(installments[0].amount, 280, tableY + 40)
-            doc.text(getDates(installments[0].dueDate), 475, tableY + 40)
-    
-            doc.text('Second Term fees', 50, tableY + 60)
-            doc.text(installments[1].amount, 280, tableY + 60)
-            doc.text(getDates(installments[1].dueDate), 475, tableY + 60)
-    
-            doc.text('Third Term fees', 50, tableY + 80)
-            doc.text(installments[2].amount, 280, tableY + 80)
-            doc.text(getDates(installments[2].dueDate), 475, tableY + 80)
-    
-            doc.text('Registration fees', 50, tableY + 100)
-            doc.text(registrationfees, 280, tableY + 100)   
-            doc.text(getDates(installments[2].dueDate), 475, tableY + 100)
-    
-            doc.text('Exam fees', 50, tableY + 120)
-            doc.text(examFees, 280, tableY + 120)   
-            doc.text(getDates(examFeeDueDate), 475, tableY + 120)
-    
-            doc.fontSize(12)
-            // doc.text('Registration Fees', 50, tableY + 20, { align: 'left' });
-            // doc.text('Online', 220, tableY + 20, { align: 'left' });
-            // doc.text('2000', 360, tableY + 20, { align: 'left' });
-            // doc.text('X789123', 450, tableY + 20, { align: 'left' });
-            // doc.fillColor('blue').text('Course', 70, 220)
-            // doc.text('NIOS Humanities', 70, 240)
-    
-            doc.strokeColor('gray')
-            doc.moveTo(50, tableY + 160).lineTo(550, tableY + 160).stroke();
-            doc.strokeColor('black');
-    
-            doc.fillColor('blue')
-    
-            //printing the total and balance
-            doc.text('Total paid: ', 50, tableY + 180)
-            doc.text('Balance to pay: ', 300, tableY + 180)
-    
-            doc.fillColor('black')
-            
-            doc.text('500 /-', 110, tableY + 180)
-            doc.text('7900 /-', 390, tableY + 180)
-    
-            // Add notes section
-            doc.text('Notes:', 50, tableY + 230, { underline: true })
-            doc.text('- The amount paid is not refundable.', 50, tableY + 250);
-            doc.text('- Any payments received after the specified due dates will be subject to a late fee. ', 50, tableY + 270)
-            doc.text(`- Invoice generated on ${new Date()}`, 50, tableY + 290)
-    
-    
-            // doc.fontSize(12)
-            // doc.fillColor('blue')
-            // doc.text('Course Fee', 50, tableY + 60)
-            // doc.text('Balance', 290, tableY + 60)
-            // doc.fontSize(10)
-            // doc.fillColor('black')
-            // doc.text('7000', 60, tableY + 80)
-            // doc.text('3900', 300, tableY + 80)
-    
-            
-    
-            // const columnNames = ['Item No', 'Item Description', 'Quantity', 'Unit Price', 'Total Amount'];
-    
-            // // Set the initial position for the table
-            // let yPosition = 200;
-    
-            // // Set cell width and height
-            // const cellWidth = 100;
-            // const cellHeight = 20;
-    
-            // // Add the table headers with borders
-            // columnNames.forEach((columnName, index) => {
-            // // Draw the cell with a border
-            // doc.rect(50 + index * cellWidth, yPosition, cellWidth, cellHeight).stroke();
-            // doc.text(columnName, 50 + index * cellWidth + 5, yPosition + 5, { bold: true });
-            // });
-    
-            // // Add sample data
-            // const sampleData = [
-            // { itemNo: '001', itemDescription: 'Product A', quantity: 5, unitPrice: 10, totalAmount: 50 },
-            // { itemNo: '002', itemDescription: 'Product B', quantity: 3, unitPrice: 15, totalAmount: 45 }
-            // ];
-    
-            // // Set the position for the data rows
-            // yPosition += cellHeight;
-    
-            // // Add the sample data to the table with borders
-            // sampleData.forEach((data, rowIndex) => {
-            //     Object.values(data).forEach((value, columnIndex) => {
-            //         // Draw the cell with a border
-            //         doc.rect(50 + columnIndex * cellWidth, yPosition + rowIndex * cellHeight, cellWidth, cellHeight).stroke();
-            //         doc.text(value.toString(), 50 + columnIndex * cellWidth + 5, yPosition + rowIndex * cellHeight + 5);
-            //     });
-            // });
-    
-    
-    
-            // Return a promise to handle asynchronous PDF generation
-            const pdfBuffer = await new Promise((resolve) => {
-                const buffers = [];
-                doc.on('data', buffer => {
-                    //dataCallback && dataCallback(buffer); // Invoke the dataCallback if provided
-                    buffers.push(buffer);
-                });
-                doc.on('end', () => {
-                    resolve(Buffer.concat(buffers));
-                    //endCallback && endCallback(); // Invoke the endCallback if provided
-                });
-                doc.end();  // Trigger the 'end' event
-            });
     
             // Create a Nodemailer transporter
             // const transporter =  nodemailer.createTransport({
@@ -249,13 +66,13 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                 to: email,
                 subject: 'Testing node mailer',
                 text: 'Please find the attached invoice.',
-                attachments: [
-                    {
-                        filename: 'invoice.pdf',
-                        content: pdfBuffer,
-                        encoding: 'base64',
-                    },
-                ],
+                // attachments: [
+                //     {
+                //         filename: 'invoice.pdf',
+                //         content: pdfBuffer,
+                //         encoding: 'base64',
+                //     },
+                // ],
             })
     
             // Setup email data with unicode symbols
