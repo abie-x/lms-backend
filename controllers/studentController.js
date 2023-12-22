@@ -43,7 +43,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
     
             doc.fontSize(16);
     
-            doc.image('/workspace/images/test.png', 250, 0, {fit: [100, 100], align: 'center' })
+            doc.image('workspace/images/test.png', 250, 0, {fit: [100, 100], align: 'center' })
     
             
     
