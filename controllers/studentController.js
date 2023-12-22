@@ -43,7 +43,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
     
             doc.fontSize(16);
     
-            doc.image('https://e7.pngegg.com/pngimages/119/921/png-clipart-flower-dahlia-flower-flower-garden-annual-plant-thumbnail.png', 250, 0, {fit: [100, 100], align: 'center' })
+            doc.image('/images/test.png', 250, 0, {fit: [100, 100], align: 'center' })
     
             
     
