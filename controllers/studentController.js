@@ -42,9 +42,10 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
             const doc = new PDFDocument();
     
             doc.fontSize(14);
+            doc.fillColor('blue')
     
             // doc.image('/workspace/controllers/test.png', 250, 0, {fit: [100, 100], align: 'center' })
-            doc.text('Linfield Eduverse', 250, 0, { align: 'center' })
+            doc.text('Linfield Eduverse', 200, 40, { align: 'center' })
     
             
     
