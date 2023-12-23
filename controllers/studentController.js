@@ -41,11 +41,11 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
 
             const doc = new PDFDocument();
     
-            doc.fontSize(16);
+            doc.fontSize(14);
             doc.fillColor('blue')
     
             // doc.image('/workspace/controllers/test.png', 250, 0, {fit: [100, 100], align: 'center' })
-            doc.text('LINFIELD EDUVERSE', 100, 40, { align: 'center' })
+            doc.text('LINFIELD EDUVERSE', 80, 40, { align: 'center' })
     
             
     
