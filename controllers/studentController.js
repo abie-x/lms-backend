@@ -45,7 +45,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
             doc.fillColor('blue')
     
             // doc.image('/workspace/controllers/test.png', 250, 0, {fit: [100, 100], align: 'center' })
-            doc.text('LINFIELD EDUVERSE', 70, 40, { align: 'center' })
+            doc.text('LINFIELD EDUVERSE', 70, 70, { align: 'center' })
     
             
     
