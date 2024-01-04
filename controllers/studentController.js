@@ -580,23 +580,30 @@ const niosFeePay = asyncHandler(async (req, res) => {
             (installment) => installment.installmentNumber === installmentNumber
         );
 
+        console.log(`printing the imnstallement details`, installmentToPay)
+
+        installmentToPay.paidAmount = installmentToPay.paidAmount + amount
+        let outstandingAmount = installmentToPay.amount - installmentToPay.paidAmount
+
         if (installmentToPay) {
             if (installmentToPay.isPaid === true) {
                 throw new Error('Student already paid this installment');
+            } else if(outstandingAmount < 0) {
+                throw new Error('Entered amount exeeded. Please check the amount once more');
             } else {
                 // if(installmentToPay.amount === amount) {
                 //     installmentToPay.isPaid = true;
                 // }
-                console.log(installmentToPay)
-                let outstandingAmount = installmentToPay.amount - installmentToPay.paidAmount
                 console.log('outstanding amount', outstandingAmount)
-                if(outstandingAmount === amount) {
+                if(outstandingAmount === 0) {
                     installmentToPay.isPaid = true;
                 }
                 console.log('printing the paidAmount')
                 console.log(installmentToPay.paidAmount)
+
+                console.log(installmentToPay)
                   
-                installmentToPay.paidAmount += amount;
+                // installmentToPay.paidAmount += amount;
                 student.feeDetails.paidAmount += amount;
                 createTransaction(student._id, installmentToPay.amount, feeType); // Create a new transaction
             }
