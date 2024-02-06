@@ -114,7 +114,7 @@ const loginTeachers = asyncHandler(async (req, res) => {
             token: generateToken(teacher._id)
         })
     } else {
-        
+        res.status(400)
         throw new Error('Invalid email or password')
     }
 })

@@ -133,8 +133,8 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
     
             doc.text('Exam fees', 50, tableY + 120)
             doc.text(examFees, 280, tableY + 120)   
-            doc.text(getDates(examFeeDueDate), 475, tableY + 120)
-    
+            // doc.text(getDates(examFeeDueDate), 475, tableY + 120)
+            doc.text(examFeeDueDate, 475, tableY + 120)
             doc.fontSize(12)
             // doc.text('Registration Fees', 50, tableY + 20, { align: 'left' });
             // doc.text('Online', 220, tableY + 20, { align: 'left' });
@@ -251,16 +251,77 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
             const info = await transporter.sendMail({
                 from: 'abhiramzmenon@gmail.com',
                 to: email,
-                subject: 'Testing node mailer',
-                text: 'Please find the attached invoice.',
+                subject: 'Congratulations! Your Enrollment Confirmation and Course Fee Information',
+                html: `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Welcome to Linfield!</title>
+                  <style>
+                    body {
+                      font-family: Arial, sans-serif;
+                      line-height: 1.6;
+                      margin: 0;
+                      padding: 0;
+                    }
+                    .container {
+                      max-width: 600px;
+                      margin: auto;
+                      padding: 20px;
+                    }
+                    .header {
+                      text-align: center;
+                      margin-bottom: 20px;
+                    }
+                    .header h1 {
+                      font-size: 24px;
+                      color: #007bff;
+                    }
+                    .message {
+                      font-size: 16px;
+                      margin-bottom: 20px;
+                    }
+                    .signature {
+                      font-style: italic;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      <h1>Welcome to Linfield Eduverse👨‍🎓</h1>
+                    </div>
+                    <div class="message">
+                      <p>Dear ${name},</p>
+                      <p>Welcome to Linfield! I'm Nishad, the founder at Linfield, and I'm thrilled to have you join our community. At Linfield, we're dedicated to creating a supportive and engaging learning environment where every student can thrive. Education is more than just what you learn from textbooks—it's about discovering your passions, developing critical thinking skills, and embracing new experiences.</p>
+                      <p>As you start on this journey with us, know that you have a team of teachers, staff, and fellow students here to support you along the way.</p>
+                      <p>While starting something new may feel daunting, remember that it's also an exciting opportunity for growth and discovery.</p>
+                      <p>Be curious, be kind, and be courageous. Embrace challenges as opportunities to learn and grow, and don't hesitate to seek help when you need it.</p>
+                      <p>I'm eager to see the incredible things you'll accomplish during your time at Linfield.</p>
+                      <p>Welcome aboard, and let's make your educational journey at Linfield truly remarkable!</p>
+                      <p>Attached below is the fee payment schedule for your reference.</p>
+                    </div>
+                    <div class="signature">
+                      <p>Warm regards,</p>
+                      <p>Nishad<br>Founder, Linfield</p>
+                    </div>
+                  </div>
+                </body>
+                </html>`,
                 attachments: [
                     {
                         filename: 'invoice.pdf',
                         content: pdfBuffer,
                         encoding: 'base64',
                     },
-                ],
-            })
+                ], 
+            });
+            
+            
+            
+            
+            
     
             // Setup email data with unicode symbols
             // const mailOptions = {
@@ -335,7 +396,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
         console.log(niosFee)
     
         if(niosFee) {
-            const { installments, examFees, registrationFees, totalAmount, admissionFees, admissionFeeDueDate, registrationFeeDueDate, examFeeDueDate } = niosFee
+            //changed exam fee from this
+            const { installments, registrationFees, totalAmount, admissionFees, admissionFeeDueDate, registrationFeeDueDate, examFeeDueDate } = niosFee
     
             const studentQuery = {
                     name,
@@ -352,14 +414,18 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     admissionCoordinator,
                     feeDetails: {
                         totalAmount,
+                        paidAmount: admissionFees,
                         admissionFees,
+                        admissionFeePaid: true,
                         admissionFeeDueDate,
                         registrationFees,
                         registrationFeeDueDate, 
-                        examFees,
-                        examFeeDueDate,
+                        // examFees,
+                        // examFeeDueDate,
                         installments,
                     },
+
+                    //modified examfeed and examfee due date from here
             }
             if (batch !== undefined && batch !== null && batch !== '') {
                 studentQuery.batch = batch;
@@ -383,9 +449,10 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     phoneNumber,
                     email,
                     studentQuery.intake,
-                    studentQuery.feeDetails.admissionFees,
-                    studentQuery.feeDetails.examFees,
-                    studentQuery.feeDetails.examFeeDueDate,
+                    studentQuery.feeDetails.admissionFees, 
+                    studentQuery.feeDetails.examFees = 'NA',
+                    // studentQuery.feeDetails.examFeeDueDate = 'depends', 
+                    'NA',
                     studentQuery.feeDetails.installments,
                     studentQuery.feeDetails.registrationFees,
                     studentQuery.feeDetails.registrationFeeDueDate
@@ -640,6 +707,8 @@ const getStudentDetails = asyncHandler(async (req, res) => {
     const {phoneNumber} = req.query
 
     const student = await NiosStudent.findOne({phoneNumber})
+
+    console.log(`currently found student is: ${student}`)
 
     if(student) {
         res.status(200).send(student)

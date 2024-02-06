@@ -33,7 +33,6 @@ const feeDetailsSchema = new mongoose.Schema(
         },
         examFees: {
             type: Number,
-            required: true 
         },
         examFeePaid: {
             type: Boolean,
@@ -205,6 +204,11 @@ const niosStudentSchema = new mongoose.Schema(
         },
         tocSubjects: {
             type: [String],
+        },
+        documentsSubmitted: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     },
     {
