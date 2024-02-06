@@ -13,7 +13,7 @@ import fs from 'fs';
 import { table } from 'console';
 
 
-async function buildPdf(name, course, batch, phoneNumber, email, intake, admissionFees, examFees, examFeeDueDate, installments, registrationfees, registrationFeeDueDate) {
+async function buildPdf(name, course, batch, phoneNumber, email, intake, admissionFees, examFees, examFeeDueDate, installments, registrationfees, registrationFeeDueDate, totalFee, paidFee) {
     console.log('hey, cool')
     console.log(email)
 
@@ -155,8 +155,8 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
     
             doc.fillColor('black')
             
-            doc.text('500 /-', 110, tableY + 180)
-            doc.text('7900 /-', 390, tableY + 180)
+            doc.text(paidFee, 110, tableY + 180)
+            doc.text(totalFee - paidFee, 390, tableY + 180)
     
             // Add notes section
             doc.text('Notes:', 50, tableY + 230, { underline: true })
@@ -455,7 +455,9 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     'NA',
                     studentQuery.feeDetails.installments,
                     studentQuery.feeDetails.registrationFees,
-                    studentQuery.feeDetails.registrationFeeDueDate
+                    studentQuery.feeDetails.registrationFeeDueDate,
+                    studentQuery.feeDetails.totalAmount,
+                    studentQuery.feeDetails.paidAmount
                 );
             }
         }  else {
