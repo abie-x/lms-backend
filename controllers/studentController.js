@@ -283,7 +283,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                       margin-bottom: 20px;
                     }
                     .signature {
-                      font-style: italic;
+                      
                     }
                   </style>
                 </head>
@@ -294,7 +294,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                     </div>
                     <div class="message">
                       <p>Dear ${name},</p>
-                      <p>Welcome to Linfield! I'm Nishad, the founder at Linfield, and I'm thrilled to have you join our community. At Linfield, we're dedicated to creating a supportive and engaging learning environment where every student can thrive. Education is more than just what you learn from textbooks—it's about discovering your passions, developing critical thinking skills, and embracing new experiences.</p>
+                      <p>Welcome to Linfield! I'm Nishad, the founder at Linfield, and I'm thrilled to have you join our community. At Linfield, we're dedicated to creating a supportive and engaging learning environment where every student can thrive.</p>
                       <p>As you start on this journey with us, know that you have a team of teachers, staff, and fellow students here to support you along the way.</p>
                       <p>While starting something new may feel daunting, remember that it's also an exciting opportunity for growth and discovery.</p>
                       <p>Be curious, be kind, and be courageous. Embrace challenges as opportunities to learn and grow, and don't hesitate to seek help when you need it.</p>
