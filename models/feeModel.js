@@ -31,7 +31,7 @@ const niosFeeSchema = new mongoose.Schema(
         },
         registrationFees: {
             type: Number,
-            required: true
+            // required: true - modified required flag here
         },
         totalAmount: {
             type: Number,
@@ -50,7 +50,7 @@ const niosFeeSchema = new mongoose.Schema(
         },
         registrationFeeDueDate: {
             type: Date,
-            required: true
+            // required: true - modified the registrationFeeDueDate
         },
         installments: [
             {

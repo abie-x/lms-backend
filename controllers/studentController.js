@@ -129,7 +129,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
     
             doc.text('Registration fees', 50, tableY + 100)
             doc.text(registrationfees, 280, tableY + 100)   
-            doc.text(getDates(installments[2].dueDate), 475, tableY + 100)
+            doc.text(examFeeDueDate, 475, tableY + 100)
     
             doc.text('Exam fees', 50, tableY + 120)
             doc.text(examFees, 280, tableY + 120)   
@@ -243,13 +243,17 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                 port: 465,
                 secure: true,
                 auth: {
-                     user: 'abhiramzmenon@gmail.com',
-                     pass: 'rsgwlnlrmsthvwqt'
-                }
+                    user: 'hellolinfield@gmail.com',
+                    pass: 'vtubtgatbgjltgqe'
+               }
+                // auth: {
+                //      user: 'abhiramzmenon@gmail.com',
+                //      pass: 'rsgwlnlrmsthvwqt'
+                // }
             })
 
             const info = await transporter.sendMail({
-                from: 'abhiramzmenon@gmail.com',
+                from: 'hellolinfield@gmail.com',
                 to: email,
                 subject: 'Congratulations! Your Enrollment Confirmation and Course Fee Information',
                 html: `<!DOCTYPE html>
@@ -283,7 +287,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                       margin-bottom: 20px;
                     }
                     .signature {
-                      
+                        font-style: italic;
                     }
                   </style>
                 </head>
@@ -304,7 +308,7 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
                     </div>
                     <div class="signature">
                       <p>Warm regards,</p>
-                      <p>Nishad<br>Founder, Linfield</p>
+                      <p>Nishad<br>Founder, Linfield Eduverse</p>
                     </div>
                   </div>
                 </body>
@@ -369,6 +373,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
     admissionCoordinator
   } = req.body;
 
+  console.log('heyy')
+
 
   //check if a student with the same email id exists
   const studentExist = await NiosStudent.findOne({phoneNumber})
@@ -396,8 +402,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
         console.log(niosFee)
     
         if(niosFee) {
-            //changed exam fee from this
-            const { installments, registrationFees, totalAmount, admissionFees, admissionFeeDueDate, registrationFeeDueDate, examFeeDueDate } = niosFee
+            //changed exam fee and reg fee , examfee due date and reg fee due date from this
+            const { installments, totalAmount, admissionFees, admissionFeeDueDate, } = niosFee
     
             const studentQuery = {
                     name,
@@ -418,8 +424,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                         admissionFees,
                         admissionFeePaid: true,
                         admissionFeeDueDate,
-                        registrationFees,
-                        registrationFeeDueDate, 
+                        // registrationFees,
+                        // registrationFeeDueDate, 
                         // examFees,
                         // examFeeDueDate,
                         installments,
@@ -439,6 +445,9 @@ const createNiosStudent = asyncHandler(async (req, res) => {
             niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees
             niosStudent.feeDetails.admissionFeePaid = true
             
+            //create a new transaction
+            createTransaction(niosStudent._id, niosStudent.feeDetails.admissionFees, 'admissionFees');
+
             res.status(201).send(niosStudent);
     
             if (niosStudent) {
@@ -454,12 +463,15 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     // studentQuery.feeDetails.examFeeDueDate = 'depends', 
                     'NA',
                     studentQuery.feeDetails.installments,
-                    studentQuery.feeDetails.registrationFees,
-                    studentQuery.feeDetails.registrationFeeDueDate,
+                    // studentQuery.feeDetails.registrationFees = 'NA',
+                    // studentQuery.feeDetails.registrationFeeDueDate ,
+                    'NA',
+                    'NA',
                     studentQuery.feeDetails.totalAmount,
                     studentQuery.feeDetails.paidAmount
                 );
             }
+
         }  else {
             throw new Error('NIOS fee doesnt found!')
         }    
@@ -609,28 +621,28 @@ const niosFeePay = asyncHandler(async (req, res) => {
 
     if (feeType === 'examFees') {
         console.log('iam part of exam fee payment')
-        console.log(feeType)
-        if (student.feeDetails.examFeePaid) {
-            throw new Error('Exam fee already paid by the student');
-        } else {
-            console.log('iam the else condition')
-            student.feeDetails.examFeePaid = true;
-            const examFeeAmount = niosFee.examFees; // Get the exam fee amount from the fee schema
-            student.feeDetails.paidAmount += examFeeAmount
-            createTransaction(student._id, examFeeAmount, feeType); // Create a new transaction
-        }  
+        // console.log(feeType)
+        // if (student.feeDetails.examFeePaid) {
+        //     throw new Error('Exam fee already paid by the student');
+        // } else {
+        //     console.log('iam the else condition')
+        //     student.feeDetails.examFeePaid = true;
+        //     const examFeeAmount = niosFee.examFees; // Get the exam fee amount from the fee schema
+        //     student.feeDetails.paidAmount += examFeeAmount
+        //     createTransaction(student._id, examFeeAmount, feeType); // Create a new transaction
+        // }  
     } else if (feeType === 'registrationFees') {
         console.log('hey, iam part of registrationfee')
-        console.log(feeType)
-        if (student.feeDetails.registrationFeePaid) {
-            throw new Error('Registration fee already paid by the student');
-        } else {
-            console.log('iam the else condition')
-            student.feeDetails.registrationFeePaid = true;
-            const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
-            student.feeDetails.paidAmount += regFeeAmount
-            createTransaction(student._id, regFeeAmount, feeType); // Create a new transaction
-        }
+        // console.log(feeType)
+        // if (student.feeDetails.registrationFeePaid) {
+        //     throw new Error('Registration fee already paid by the student');
+        // } else {
+        //     console.log('iam the else condition')
+        //     student.feeDetails.registrationFeePaid = true;
+        //     const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
+        //     student.feeDetails.paidAmount += regFeeAmount
+        //     createTransaction(student._id, regFeeAmount, feeType); // Create a new transaction
+        // }
     } else if(feeType === 'admissionFees') {
         console.log('hey, iam part of admissionFees')
         console.log(feeType)

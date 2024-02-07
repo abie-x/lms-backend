@@ -24,7 +24,6 @@ const feeDetailsSchema = new mongoose.Schema(
         },
         registrationFees: {
             type: Number,
-            required: true
         },
         registrationFeePaid: {
             type: Boolean,

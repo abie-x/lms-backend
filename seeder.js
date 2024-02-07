@@ -7,6 +7,7 @@ import { NiosFee } from './models/feeModel.js'
 import { testFeeData } from './data/feeData.js'
 import { testTeachers } from './data/teachers.js'
 import { Teacher } from './models/teacherModel.js'
+import { Transaction } from './models/transactionModel.js'
 import connectDB from './config/db.js'
 
 dotenv.config()
@@ -33,9 +34,11 @@ const importData = async () => {
 
 const destroyData = async () => {
   try {
-    await NiosStudent.deleteMany()
+    // await NiosStudent.deleteMany()
     // await NiosFee.deleteMany()
     // await Teacher.deleteMany()
+
+    await Transaction.deleteMany()
 
     console.log('Data Destroyed!'.red.inverse)
     process.exit()
