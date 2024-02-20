@@ -352,143 +352,248 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
         }
 }
 
+const createNiosStudent = asyncHandler(async (req, res) => {
+    const {
+        name,
+        place,
+        year,
+        course,
+        batch,
+        intake,
+        mode,
+        phoneNumber,
+        parentNumber,
+        dob,
+        email,
+        branch,
+        admissionCoordinator,
+        admissionFee // New parameter: admissionFee
+    } = req.body;
+
+    // Check if a student with the same phone number exists
+    const studentExist = await NiosStudent.findOne({ phoneNumber });
+
+    if (studentExist) {
+        throw new Error('A student with the given phone number already exists in the database.');
+    } else {
+        const query = {
+            intake,
+            course,
+            year,
+            mode,
+        };
+
+        if (batch !== undefined && batch !== null && batch !== '') {
+            query.batch = batch;
+        }
+
+        const niosFee = await NiosFee.findOne(query);
+
+        if (niosFee) {
+            const { installments, totalAmount, admissionFees, admissionFeeDueDate } = niosFee;
+
+            const studentQuery = {
+                name,
+                place,
+                year,
+                course,
+                intake,
+                mode,
+                phoneNumber,
+                parentNumber,
+                dob,
+                email,
+                branch,
+                admissionCoordinator,
+                feeDetails: {
+                    totalAmount,
+                    paidAmount: admissionFee,
+                    admissionFees, // Assign admission fee from request body
+                    // admissionFeePaid: true,
+                    admissionFeeDueDate,
+                    installments,
+                },
+            };
+
+            if (batch !== undefined && batch !== null && batch !== '') {
+                studentQuery.batch = batch;
+            }
+
+            const niosStudent = await NiosStudent.create(studentQuery);
+
+            // Update fee details
+            //niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees;
+            if(niosStudent.feeDetails.admissionFees === admissionFee) {
+                niosStudent.feeDetails.admissionFeePaid = true;
+            }
+
+            // Create a new transaction
+            createTransaction(niosStudent._id, admissionFee, 'admissionFees');
+
+            // Send response with the created student
+            res.status(201).send(niosStudent);
+
+            // Build PDF with the admission fee included
+            await buildPdf(
+                name,
+                course,
+                studentQuery.batch && studentQuery.batch,
+                phoneNumber,
+                email,
+                studentQuery.intake,
+                admissionFee,
+                'NA', // Assuming exam fee is not applicable during admission
+                'NA', // Assuming exam fee due date is not applicable during admission
+                studentQuery.feeDetails.installments,
+                'NA', // Assuming registration fee is not applicable during admission
+                'NA', // Assuming registration fee due date is not applicable during admission
+                'NA', // Assuming total amount is not needed during admission
+                niosStudent.feeDetails.paidAmount // Including paid amount in PDF
+            );
+        } else {
+            throw new Error('NIOS fee not found for the provided criteria.');
+        }
+    }
+});
+
+
 // desc  => create a new NIOS student
 //route => /api/students/nios
 //access => public
-const createNiosStudent = asyncHandler(async (req, res) => {
+// const createNiosStudent = asyncHandler(async (req, res) => {
 
-  const {
-    name,
-    place,
-    year,
-    course,
-    batch,
-    intake,
-    mode,
-    phoneNumber,
-    parentNumber,
-    dob,
-    email,
-    branch,
-    admissionCoordinator
-  } = req.body;
+//   const {
+//     name,
+//     place,
+//     year,
+//     course,
+//     batch,
+//     intake,
+//     mode,
+//     phoneNumber,
+//     parentNumber,
+//     dob,
+//     email,
+//     branch,
+//     admissionCoordinator
+//   } = req.body;
 
-  console.log('heyy')
+//   console.log('heyy')
 
 
-  //check if a student with the same email id exists
-  const studentExist = await NiosStudent.findOne({phoneNumber})
+//   //check if a student with the same email id exists
+//   const studentExist = await NiosStudent.findOne({phoneNumber})
 
-  if(studentExist) {
-    throw new Error('Given phone number already exists in the database')
-  } else {
-    const query = {
-        intake,
-        course,
-        year,
-        mode,
-      };
+//   if(studentExist) {
+//     throw new Error('Given phone number already exists in the database')
+//   } else {
+//     const query = {
+//         intake,
+//         course,
+//         year,
+//         mode,
+//       };
     
-      console.log(batch)
+//       console.log(batch)
     
-      if (batch !== undefined && batch !== null && batch !== '') {
-        query.batch = batch;
-      }
+//       if (batch !== undefined && batch !== null && batch !== '') {
+//         query.batch = batch;
+//       }
     
-      console.log(query)
+//       console.log(query)
     
-        const niosFee = await NiosFee.findOne(query);
+//         const niosFee = await NiosFee.findOne(query);
     
-        console.log(niosFee)
+//         console.log(niosFee)
     
-        if(niosFee) {
-            //changed exam fee and reg fee , examfee due date and reg fee due date from this
-            const { installments, totalAmount, admissionFees, admissionFeeDueDate, } = niosFee
+//         if(niosFee) {
+//             //changed exam fee and reg fee , examfee due date and reg fee due date from this
+//             const { installments, totalAmount, admissionFees, admissionFeeDueDate, } = niosFee
     
-            const studentQuery = {
-                    name,
-                    place,
-                    year,
-                    course,
-                    intake,
-                    mode,
-                    phoneNumber,
-                    parentNumber,
-                    dob,
-                    email,
-                    branch,
-                    admissionCoordinator,
-                    feeDetails: {
-                        totalAmount,
-                        paidAmount: admissionFees,
-                        admissionFees,
-                        admissionFeePaid: true,
-                        admissionFeeDueDate,
-                        // registrationFees,
-                        // registrationFeeDueDate, 
-                        // examFees,
-                        // examFeeDueDate,
-                        installments,
-                    },
+//             const studentQuery = {
+//                     name,
+//                     place,
+//                     year,
+//                     course,
+//                     intake,
+//                     mode,
+//                     phoneNumber,
+//                     parentNumber,
+//                     dob,
+//                     email,
+//                     branch,
+//                     admissionCoordinator,
+//                     feeDetails: {
+//                         totalAmount,
+//                         paidAmount: admissionFees,
+//                         admissionFees,
+//                         admissionFeePaid: true,
+//                         admissionFeeDueDate,
+//                         // registrationFees,
+//                         // registrationFeeDueDate, 
+//                         // examFees,
+//                         // examFeeDueDate,
+//                         installments,
+//                     },
 
-                    //modified examfeed and examfee due date from here
-            }
-            if (batch !== undefined && batch !== null && batch !== '') {
-                studentQuery.batch = batch;
-              }
+//                     //modified examfeed and examfee due date from here
+//             }
+//             if (batch !== undefined && batch !== null && batch !== '') {
+//                 studentQuery.batch = batch;
+//               }
     
-            const niosStudent = await NiosStudent.create(studentQuery)
-            // res.status(201).send(niosStudent)
-            // if(niosStudent) {
-            //     await buildPdf(name, course, studentQuery.batch && studentQuery.batch, phoneNumber, email, studentQuery.intake, studentQuery.feeDetails.admissionFees, studentQuery.feeDetails.examFees, studentQuery.feeDetails.examFeeDueDate, studentQuery.feeDetails.installments, studentQuery.feeDetails.registrationFees, studentQuery.feeDetails.registrationFeeDueDate)
-            // }
-            niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees
-            niosStudent.feeDetails.admissionFeePaid = true
+//             const niosStudent = await NiosStudent.create(studentQuery)
+//             // res.status(201).send(niosStudent)
+//             // if(niosStudent) {
+//             //     await buildPdf(name, course, studentQuery.batch && studentQuery.batch, phoneNumber, email, studentQuery.intake, studentQuery.feeDetails.admissionFees, studentQuery.feeDetails.examFees, studentQuery.feeDetails.examFeeDueDate, studentQuery.feeDetails.installments, studentQuery.feeDetails.registrationFees, studentQuery.feeDetails.registrationFeeDueDate)
+//             // }
+//             niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees
+//             niosStudent.feeDetails.admissionFeePaid = true
             
-            //create a new transaction
-            createTransaction(niosStudent._id, niosStudent.feeDetails.admissionFees, 'admissionFees');
+//             //create a new transaction
+//             createTransaction(niosStudent._id, niosStudent.feeDetails.admissionFees, 'admissionFees');
 
-            res.status(201).send(niosStudent);
+//             res.status(201).send(niosStudent);
     
-            if (niosStudent) {
-                await buildPdf(
-                    name,
-                    course,
-                    studentQuery.batch && studentQuery.batch,
-                    phoneNumber,
-                    email,
-                    studentQuery.intake,
-                    studentQuery.feeDetails.admissionFees, 
-                    studentQuery.feeDetails.examFees = 'NA',
-                    // studentQuery.feeDetails.examFeeDueDate = 'depends', 
-                    'NA',
-                    studentQuery.feeDetails.installments,
-                    // studentQuery.feeDetails.registrationFees = 'NA',
-                    // studentQuery.feeDetails.registrationFeeDueDate ,
-                    'NA',
-                    'NA',
-                    studentQuery.feeDetails.totalAmount,
-                    studentQuery.feeDetails.paidAmount
-                );
-            }
+//             if (niosStudent) {
+//                 await buildPdf(
+//                     name,
+//                     course,
+//                     studentQuery.batch && studentQuery.batch,
+//                     phoneNumber,
+//                     email,
+//                     studentQuery.intake,
+//                     studentQuery.feeDetails.admissionFees, 
+//                     studentQuery.feeDetails.examFees = 'NA',
+//                     // studentQuery.feeDetails.examFeeDueDate = 'depends', 
+//                     'NA',
+//                     studentQuery.feeDetails.installments,
+//                     // studentQuery.feeDetails.registrationFees = 'NA',
+//                     // studentQuery.feeDetails.registrationFeeDueDate ,
+//                     'NA',
+//                     'NA',
+//                     studentQuery.feeDetails.totalAmount,
+//                     studentQuery.feeDetails.paidAmount
+//                 );
+//             }
 
-        }  else {
-            throw new Error('NIOS fee doesnt found!')
-        }    
-    }
+//         }  else {
+//             throw new Error('NIOS fee doesnt found!')
+//         }    
+//     }
 
-  // Fetch NiosFee based on the provided intake, course, batch, and year
+//   // Fetch NiosFee based on the provided intake, course, batch, and year
   
 
         
         
         
-    // } else {
-    //     // res.status(404)
-    //     throw new Error(`Nios fee doesnt found for the specific criteria`)
-    // }
+//     // } else {
+//     //     // res.status(404)
+//     //     throw new Error(`Nios fee doesnt found for the specific criteria`)
+//     // }
 
-})
+// })
 
 //desc => create a new fee record for nios student
 //route => /api/students/fees/nios
