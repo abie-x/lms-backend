@@ -63,6 +63,16 @@ const feeDetailsSchema = new mongoose.Schema(
                     default: false
                 }
             }
+        ],
+        customFees: [
+            {
+                feeName: {
+                    type: String
+                },
+                amount: {
+                    type: Number
+                }
+            }
         ]
     },
   );

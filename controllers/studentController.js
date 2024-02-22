@@ -370,6 +370,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
         admissionFee // New parameter: admissionFee
     } = req.body;
 
+
     // Check if a student with the same phone number exists
     const studentExist = await NiosStudent.findOne({ phoneNumber });
 
@@ -408,7 +409,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                 feeDetails: {
                     totalAmount,
                     paidAmount: admissionFee,
-                    admissionFees, // Assign admission fee from request body
+                    admissionFees: admissionFee,
                     // admissionFeePaid: true,
                     admissionFeeDueDate,
                     installments,
@@ -421,11 +422,21 @@ const createNiosStudent = asyncHandler(async (req, res) => {
 
             const niosStudent = await NiosStudent.create(studentQuery);
 
+            console.log(`admissionFees: ${niosStudent.feeDetails.admissionFees}`)
+            console.log(`admissionFee: ${admissionFee}`)
+            console.log(typeof(admissionFee))
+            console.log(typeof niosStudent.feeDetails.admissionFees)
+
+
             // Update fee details
-            //niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees;
-            if(niosStudent.feeDetails.admissionFees === admissionFee) {
+            //niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees;  
+            if(niosStudent.feeDetails.admissionFees === parseInt(admissionFee)) {
+                console.log('hey, iamm executing')
                 niosStudent.feeDetails.admissionFeePaid = true;
             }
+
+            // console.log(`printing the NIOS student data`)
+            // console.log(niosStudent)
 
             // Create a new transaction
             createTransaction(niosStudent._id, admissionFee, 'admissionFees');
@@ -682,12 +693,13 @@ const createNiosStudent = asyncHandler(async (req, res) => {
 
 //----------
 const niosFeePay = asyncHandler(async (req, res) => {
-    const { phoneNumber, feeType, installmentNumber, amount } = req.body;
+    const { phoneNumber, feeType, installmentNumber, amount, feeName } = req.body;
 
     console.log(phoneNumber)
     console.log(feeType)
     console.log(installmentNumber)
     console.log(amount)
+    console.log(`feeName: ${feeName}`)
 
     // Find the student based on phoneNumber or email
     let student;
@@ -700,101 +712,91 @@ const niosFeePay = asyncHandler(async (req, res) => {
         throw new Error('Student not found');
     }
 
-    // Extract the student's details
-    const { intake, course, batch, year, mode } = student;
-
-    // Determine the appropriate fees based on student's details
-    const feeQuery = {
-        intake,
-        course,
-        year,
-        mode
-    }
-
-    
-
-    if (batch !== undefined && batch !== null && batch !== '') {
-        feeQuery.batch = batch;
-      }
-
-    const niosFee = await NiosFee.findOne(feeQuery);
-
-
-    if (!niosFee) {
-        throw new Error('Unable to fetch NIOS fee for this student');
-    }
-
-    if (feeType === 'examFees') {
-        console.log('iam part of exam fee payment')
-        // console.log(feeType)
-        // if (student.feeDetails.examFeePaid) {
-        //     throw new Error('Exam fee already paid by the student');
-        // } else {
-        //     console.log('iam the else condition')
-        //     student.feeDetails.examFeePaid = true;
-        //     const examFeeAmount = niosFee.examFees; // Get the exam fee amount from the fee schema
-        //     student.feeDetails.paidAmount += examFeeAmount
-        //     createTransaction(student._id, examFeeAmount, feeType); // Create a new transaction
-        // }  
-    } else if (feeType === 'registrationFees') {
-        console.log('hey, iam part of registrationfee')
-        // console.log(feeType)
-        // if (student.feeDetails.registrationFeePaid) {
-        //     throw new Error('Registration fee already paid by the student');
-        // } else {
-        //     console.log('iam the else condition')
-        //     student.feeDetails.registrationFeePaid = true;
-        //     const regFeeAmount = niosFee.registrationFees; // Get the registration fee amount from the fee schema
-        //     student.feeDetails.paidAmount += regFeeAmount
-        //     createTransaction(student._id, regFeeAmount, feeType); // Create a new transaction
-        // }
-    } else if(feeType === 'admissionFees') {
-        console.log('hey, iam part of admissionFees')
-        console.log(feeType)
-        if (student.feeDetails.admissionFeePaid) {
-            throw new Error('Admission fee already paid by the student');
-        } else {
-            console.log('iam the else condition')
-            student.feeDetails.admissionFeePaid = true;
-            const admAmount = niosFee.admissionFees; // Get the registration fee amount from the fee schema
-            student.feeDetails.paidAmount += admAmount
-            createTransaction(student._id, admAmount, feeType); // Create a new transaction
-        }
+    if(feeName) {
+        //do soemthing related to custom fee payment
+        // Add custom fee to student record
+        student.feeDetails.customFees.push({ feeName, amount });
     } else {
-        console.log('hey theree!!')
-        const installmentToPay = student.feeDetails.installments.find(
-            (installment) => installment.installmentNumber === installmentNumber
-        );
+        // Extract the student's details
+        const { intake, course, batch, year, mode } = student;
 
-        console.log(`printing the imnstallement details`, installmentToPay)
+        // Determine the appropriate fees based on student's details
+        const feeQuery = {
+            intake,
+            course,
+            year,
+            mode
+        }
 
-        installmentToPay.paidAmount = installmentToPay.paidAmount + amount
-        let outstandingAmount = installmentToPay.amount - installmentToPay.paidAmount
+        
 
-        if (installmentToPay) {
-            if (installmentToPay.isPaid === true) {
-                throw new Error('Student already paid this installment');
-            } else if(outstandingAmount < 0) {
-                throw new Error('Entered amount exeeded. Please check the amount once more');
+        if (batch !== undefined && batch !== null && batch !== '') {
+            feeQuery.batch = batch;
+        }
+
+        const niosFee = await NiosFee.findOne(feeQuery);
+
+
+        if (!niosFee) {
+            throw new Error('Unable to fetch NIOS fee for this student');
+        }
+
+        if (feeType === 'examFees') {
+
+            console.log('iam part of exam fee payment')
+
+        } else if (feeType === 'registrationFees') {
+
+            console.log('hey, iam part of registrationfee')
+            
+        } else if(feeType === 'admissionFees') {
+            console.log('hey, iam part of admissionFees')
+            console.log(feeType)
+            if (student.feeDetails.admissionFeePaid) {
+                throw new Error('Admission fee already paid by the student');
             } else {
-                // if(installmentToPay.amount === amount) {
-                //     installmentToPay.isPaid = true;
-                // }
-                console.log('outstanding amount', outstandingAmount)
-                if(outstandingAmount === 0) {
-                    installmentToPay.isPaid = true;
-                }
-                console.log('printing the paidAmount')
-                console.log(installmentToPay.paidAmount)
-
-                console.log(installmentToPay)
-                  
-                // installmentToPay.paidAmount += amount;
-                student.feeDetails.paidAmount += amount;
-                createTransaction(student._id, installmentToPay.amount, feeType); // Create a new transaction
+                console.log('iam the else condition')
+                student.feeDetails.admissionFeePaid = true;
+                const admAmount = niosFee.admissionFees; // Get the registration fee amount from the fee schema
+                student.feeDetails.paidAmount += admAmount
+                createTransaction(student._id, admAmount, feeType); // Create a new transaction
             }
         } else {
-            return res.status(404).json({ message: 'Installment not found' });
+            console.log('hey theree!!')
+            const installmentToPay = student.feeDetails.installments.find(
+                (installment) => installment.installmentNumber === installmentNumber
+            );
+
+            console.log(`printing the imnstallement details`, installmentToPay)
+
+            installmentToPay.paidAmount = installmentToPay.paidAmount + amount
+            let outstandingAmount = installmentToPay.amount - installmentToPay.paidAmount
+
+            if (installmentToPay) {
+                if (installmentToPay.isPaid === true) {
+                    throw new Error('Student already paid this installment');
+                } else if(outstandingAmount < 0) {
+                    throw new Error('Entered amount exeeded. Please check the amount once more');
+                } else {
+                    // if(installmentToPay.amount === amount) {
+                    //     installmentToPay.isPaid = true;
+                    // }
+                    console.log('outstanding amount', outstandingAmount)
+                    if(outstandingAmount === 0) {
+                        installmentToPay.isPaid = true;
+                    }
+                    console.log('printing the paidAmount')
+                    console.log(installmentToPay.paidAmount)
+
+                    console.log(installmentToPay)
+                    
+                    // installmentToPay.paidAmount += amount;
+                    student.feeDetails.paidAmount += amount;
+                    createTransaction(student._id, installmentToPay.amount, feeType); // Create a new transaction
+                }
+            } else {
+                return res.status(404).json({ message: 'Installment not found' });
+            }
         }
     }
 
