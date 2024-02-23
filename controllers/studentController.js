@@ -431,6 +431,17 @@ const createNiosStudent = asyncHandler(async (req, res) => {
             if(niosStudent.feeDetails.admissionFees === parseInt(admissionFee)) {
                 console.log('hey, iamm executing')
                 niosStudent.feeDetails.admissionFeePaid = true;
+                niosStudent.save()
+
+
+                // console.log(`printing the NIOS student data`)
+                // console.log(niosStudent)
+
+                // Create a new transaction
+                createTransaction(niosStudent._id, admissionFee, 'admissionFees');
+
+                // Send response with the created student
+                res.status(201).send(niosStudent);
             } else {
                     //update the admissionFeePaid amount
                     niosStudent.feeDetails.admissionFeePaidAmount = admissionFee
@@ -765,11 +776,12 @@ const niosFeePay = asyncHandler(async (req, res) => {
                 res.status(200)
                 throw new Error('Admission fee already paid by the student');
             } else {
-    
                 let tempAmount = student.feeDetails.admissionFeePaidAmount + amount
+                console.log(tempAmount)
                 if(tempAmount > student.feeDetails.admissionFees) {
                     throw new Error('Entered amount exceeds the required amount')
                 } else if(tempAmount === student.feeDetails.admissionFees) {
+                    console.log('iam executing the good condition')
                     student.feeDetails.admissionFeePaid = true;
                     student.feeDetails.paidAmount += amount
                     student.feeDetails.admissionFeePaidAmount += amount
