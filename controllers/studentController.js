@@ -762,13 +762,24 @@ const niosFeePay = asyncHandler(async (req, res) => {
             console.log('hey, iam part of admissionFees')
             console.log(feeType)
             if (student.feeDetails.admissionFeePaid) {
+                res.status(200)
                 throw new Error('Admission fee already paid by the student');
             } else {
-                console.log('iam the else condition')
-                student.feeDetails.admissionFeePaid = true;
-                const admAmount = niosFee.admissionFees; // Get the registration fee amount from the fee schema
-                student.feeDetails.paidAmount += admAmount
-                createTransaction(student._id, admAmount, feeType); // Create a new transaction
+    
+                let tempAmount = student.feeDetails.admissionFeePaidAmount + amount
+                if(tempAmount > student.feeDetails.admissionFees) {
+                    throw new Error('Entered amount exceeds the required amount')
+                } else if(tempAmount === student.feeDetails.admissionFees) {
+                    student.feeDetails.admissionFeePaid = true;
+                    student.feeDetails.paidAmount += amount
+                    student.feeDetails.admissionFeePaidAmount += amount
+                    createTransaction(student._id, amount, feeType)
+                } else {
+                    student.feeDetails.paidAmount += amount
+                    student.feeDetails.admissionFeePaidAmount += amount
+                    createTransaction(student._id, amount, feeType)
+                }
+                
             }
         } else {
             console.log('hey theree!!')
