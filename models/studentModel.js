@@ -22,6 +22,9 @@ const feeDetailsSchema = new mongoose.Schema(
             required: true,
             default: false
         },
+        admissionFeePaidAmount: {
+            type: Number,
+        },
         registrationFees: {
             type: Number,
         },

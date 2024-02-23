@@ -409,7 +409,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                 feeDetails: {
                     totalAmount,
                     paidAmount: admissionFee,
-                    admissionFees: admissionFee,
+                    admissionFees,
                     // admissionFeePaid: true,
                     admissionFeeDueDate,
                     installments,
@@ -420,47 +420,56 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                 studentQuery.batch = batch;
             }
 
-            const niosStudent = await NiosStudent.create(studentQuery);
+            if(studentQuery.feeDetails.admissionFees < parseInt(admissionFee)) {
+                res.status(200)
+                throw new Error('Entered admission fee exceeds the limit')
+            } else {
+                const niosStudent = await NiosStudent.create(studentQuery);
 
-            console.log(`admissionFees: ${niosStudent.feeDetails.admissionFees}`)
-            console.log(`admissionFee: ${admissionFee}`)
-            console.log(typeof(admissionFee))
-            console.log(typeof niosStudent.feeDetails.admissionFees)
 
-
-            // Update fee details
-            //niosStudent.feeDetails.paidAmount = niosStudent.feeDetails.admissionFees;  
+            // Update fee details 
             if(niosStudent.feeDetails.admissionFees === parseInt(admissionFee)) {
                 console.log('hey, iamm executing')
                 niosStudent.feeDetails.admissionFeePaid = true;
+            } else {
+                    //update the admissionFeePaid amount
+                    niosStudent.feeDetails.admissionFeePaidAmount = admissionFee
+
+                    console.log(niosStudent.feeDetails.admissionFeePaidAmount)
+                    niosStudent.save()
+
+
+                    // console.log(`printing the NIOS student data`)
+                    // console.log(niosStudent)
+
+                    // Create a new transaction
+                    createTransaction(niosStudent._id, admissionFee, 'admissionFees');
+
+                    // Send response with the created student
+                    res.status(201).send(niosStudent);
+
+                    // Build PDF with the admission fee included
+                    await buildPdf(
+                        name,
+                        course,
+                        studentQuery.batch && studentQuery.batch,
+                        phoneNumber,
+                        email,
+                        studentQuery.intake,
+                        admissionFee,
+                        'NA', // Assuming exam fee is not applicable during admission
+                        'NA', // Assuming exam fee due date is not applicable during admission
+                        studentQuery.feeDetails.installments,
+                        'NA', // Assuming registration fee is not applicable during admission
+                        'NA', // Assuming registration fee due date is not applicable during admission
+                        'NA', // Assuming total amount is not needed during admission
+                        niosStudent.feeDetails.paidAmount // Including paid amount in PDF
+                    );
+                }
             }
 
-            // console.log(`printing the NIOS student data`)
-            // console.log(niosStudent)
+            
 
-            // Create a new transaction
-            createTransaction(niosStudent._id, admissionFee, 'admissionFees');
-
-            // Send response with the created student
-            res.status(201).send(niosStudent);
-
-            // Build PDF with the admission fee included
-            await buildPdf(
-                name,
-                course,
-                studentQuery.batch && studentQuery.batch,
-                phoneNumber,
-                email,
-                studentQuery.intake,
-                admissionFee,
-                'NA', // Assuming exam fee is not applicable during admission
-                'NA', // Assuming exam fee due date is not applicable during admission
-                studentQuery.feeDetails.installments,
-                'NA', // Assuming registration fee is not applicable during admission
-                'NA', // Assuming registration fee due date is not applicable during admission
-                'NA', // Assuming total amount is not needed during admission
-                niosStudent.feeDetails.paidAmount // Including paid amount in PDF
-            );
         } else {
             throw new Error('NIOS fee not found for the provided criteria.');
         }
