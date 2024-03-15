@@ -897,6 +897,8 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
     const studentId = req.params.id
     const updatedFields = req.body;
 
+    console.log(`updated fields are ${updatedFields}`)
+
     const student = await NiosStudent.findByIdAndUpdate(studentId, {
         $set: updatedFields
     }, { new: true });
@@ -915,19 +917,32 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
 //route => /api/students/:id
 //access => public
 const updateStudent = asyncHandler(async (req, res) => {
-    const studentId = req.params.id 
+    const studentId = req.params.id;
+    const updatedFields = req.body;
 
-    const updatedFields = req.body
+    console.log(updatedFields)
 
-    const student = await NiosStudent.findByIdAndUpdate(studentId, { $set: updatedFields }, { new: true });
+    // Update the student document
+    const student = await NiosStudent.findByIdAndUpdate(
+        studentId,
+        updatedFields,
+        { new: true }
+    );
 
-    if(student) {
-        res.status(200).send(student)
+    student.feeDetails.examFees = updatedFields.examFees
+    student.feeDetails.registrationFees = updatedFields.registrationFees
+
+    student.save()
+
+    // console.log(student)
+
+    if (student) {
+        res.status(200).send(student);
     } else {
-        res.status(400)
-        throw new Error('Error updating the student record')
+        res.status(400);
+        throw new Error('Error updating the student record');
     }
-})
+});
 
 //desc => filter the students who hasnt paid fees (be it exam fees, registration fees or tuition fees)
 //route => /api/students/unpaidfees

@@ -34,9 +34,9 @@ const importData = async () => {
 
 const destroyData = async () => {
   try {
-    await NiosStudent.deleteMany()
+    // await NiosStudent.deleteMany()
     // await NiosFee.deleteMany()
-    // await Teacher.deleteMany()
+    await Teacher.deleteMany()
 
     // await Transaction.deleteMany()
 

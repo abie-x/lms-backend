@@ -7,9 +7,12 @@ import { generateToken } from "../utils/generateToken.js";
 //route => POST /api/teachers/admin
 //access => private(admin)
 const registerAdmin = asyncHandler(async (req, res) => {
-    const {name, phoneNumber, password } = req.body
+    const {name, phoneNumber, email, password } = req.body
 
-    const adminExist = await Teacher.findOne({phoneNumber})
+    console.log(email)
+    console.log(password)
+
+    const adminExist = await Teacher.findOne({email})
 
     if(adminExist) {
         res.status(400)
@@ -19,6 +22,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
     const admin = await Teacher.create({
         name,
         phoneNumber,
+        email,
         password,
         isAdmin: true
     })
@@ -28,6 +32,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
             _id: admin.id,
             name: admin.name,
             phoneNumber: admin.phoneNumber,
+            email: admin.email,
             isAdmin: admin.isAdmin,
             token: generateToken(admin._id)
         })
@@ -65,9 +70,12 @@ const loginAdmin = asyncHandler(async (req, res) => {
 //route => POST /api/teachers/register
 //access => private (admin only)
 const registerTeachers = asyncHandler(async (req, res) => {
-    const {name, phoneNumber, password } = req.body
+    const {name, phoneNumber, email, password } = req.body
 
-    const teacherExist = await Teacher.findOne({phoneNumber})
+    console.log(email)
+    console.log(password)
+
+    const teacherExist = await Teacher.findOne({email})
 
     if(teacherExist) {
         res.status(400)
@@ -77,6 +85,7 @@ const registerTeachers = asyncHandler(async (req, res) => {
     const teacher = await Teacher.create({
         name,
         phoneNumber,
+        email,
         password,
     })
 
@@ -85,6 +94,7 @@ const registerTeachers = asyncHandler(async (req, res) => {
             _id: teacher.id,
             name: teacher.name,
             phoneNumber: teacher.phoneNumber,
+            email: teacher.email,
             isAdmin: teacher.isAdmin,
             token: generateToken(teacher._id)
         })
@@ -99,9 +109,11 @@ const registerTeachers = asyncHandler(async (req, res) => {
 //route => POST /api/teachers/login
 //access => public
 const loginTeachers = asyncHandler(async (req, res) => {
-    const {phoneNumber, password} = req.body
+    const {email, password} = req.body
 
-    const teacher = await Teacher.findOne({phoneNumber})
+    console.log(email)
+
+    const teacher = await Teacher.findOne({email})
 
     console.log(teacher)
 
@@ -110,6 +122,7 @@ const loginTeachers = asyncHandler(async (req, res) => {
             _id: teacher._id,
             name: teacher.name,
             phoneNumber: teacher.phoneNumber,
+            email: teacher.email,
             isAdmin: teacher.isAdmin,
             token: generateToken(teacher._id)
         })
