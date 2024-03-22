@@ -1,9 +1,10 @@
 import express from 'express'
-import { createNiosStudent, niosFeePay, getStudentDetails, updateStudent, getStudentsWithUnpaidFees, getStudentsCreatedToday, updateExistingStudent, fetchStudentDetailsById } from '../controllers/studentController.js'
+import { createNiosStudent, niosFeePay, getStudentDetails, updateStudent, getStudentsWithUnpaidFees, getStudentsCreatedToday, updateExistingStudent, fetchStudentDetailsById, getNumberOfAdmissions } from '../controllers/studentController.js'
 import { protect, admin } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
 
+router.get('/totalAdmissions', getNumberOfAdmissions)
 router.get('/details', getStudentDetails)
 router.get('/:id', fetchStudentDetailsById)
 router.post('/nios', createNiosStudent)

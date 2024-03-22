@@ -352,6 +352,29 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
         }
 }
 
+const createNewTransaction = async (studentId, amount, type) => {
+
+    console.log(`Printing the values assosiated with transactions..`)
+    console.log(studentId)
+    console.log(amount)
+    console.log(type)
+
+    try {
+        const transaction = new Transaction({
+            amount,
+            type,
+            date: new Date(),
+            studentId
+        });
+
+        await transaction.save();
+    } catch (error) {
+        throw new Error(`Error creating transaction: ${error.message}`);
+    }
+};
+
+
+
 const createNiosStudent = asyncHandler(async (req, res) => {
     const {
         name,
@@ -438,12 +461,12 @@ const createNiosStudent = asyncHandler(async (req, res) => {
 
                 // Update fee details 
                 if (niosStudent.feeDetails.admissionFees === parseInt(admissionFee)) {
-                    console.log('hey, iamm executing')
+                    niosStudent.feeDetails.admissionFeePaidAmount = admissionFee
                     niosStudent.feeDetails.admissionFeePaid = true;
                     niosStudent.save()
 
                     // Create a new transaction
-                    createTransaction(niosStudent._id, admissionFee, 'admissionFees');
+                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit'  );
 
                     // Send response with the created student
                     res.status(201).send(niosStudent);
@@ -453,7 +476,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     niosStudent.save()
 
                     // Create a new transaction
-                    createTransaction(niosStudent._id, admissionFee, 'admissionFees');
+                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit'  );
 
                     // Send response with the created student
                     res.status(201).send(niosStudent);
@@ -1015,6 +1038,21 @@ const getStudentsCreatedToday = asyncHandler(async (req, res) => {
 })
 
 
+const getNumberOfAdmissions = async (req, res) => {
+    try {
+        const numberOfAdmissions = await NiosStudent.countDocuments();
+
+        console.log(`printing the number of admissions, ${numberOfAdmissions}`)
+
+        res.status(200).json({ numberOfAdmissions });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching number of admissions', error: error.message });
+    }
+};
+
+
+
+
 export { 
     createNiosStudent,
     niosFeePay,
@@ -1024,5 +1062,6 @@ export {
     getStudentsWithUnpaidFees,
     getStudentsCreatedToday,
     updateExistingStudent,
-    buildPdf
+    buildPdf,
+    getNumberOfAdmissions
 };

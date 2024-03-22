@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const transactionSchema = new mongoose.Schema(
     {
@@ -6,22 +6,28 @@ const transactionSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
-        feeType: {
+        type: {
             type: String,
+            enum: ['credit', 'debit'], // Specify whether it's a credit or debit transaction
+            required: true
+        },
+        description: {
+            type: String,
+        },
+        date: {
+            type: Date,
             required: true
         },
         studentId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'NiosStudent'
+            ref: 'NiosStudent' // Reference to the student for credit transactions
         }
-    }, 
+    },
     {
         timestamps: true
     }
-)
+);
 
-const Transaction = mongoose.model('Transaction', transactionSchema)
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
-export {
-    Transaction
-}
+export { Transaction };
