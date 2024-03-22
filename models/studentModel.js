@@ -84,6 +84,10 @@ const feeDetailsSchema = new mongoose.Schema(
 //define the Base studentSchema
 const studentSchema = new mongoose.Schema(
     {
+        admissionNumber: {
+            type: Number,
+            unique: true
+        },
         name: {
             type: String,
             required: true
@@ -228,6 +232,7 @@ const niosStudentSchema = new mongoose.Schema(
     }
 )
 
+
 //inheriting the Base student schema with the niosStudentSchema
 niosStudentSchema.add(studentSchema)
 
@@ -239,6 +244,7 @@ niosStudentSchema.pre('save', async function (next) {
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
 })
+
 
 //creating a new NIOS student model
 const NiosStudent = mongoose.model('NiosStudent', niosStudentSchema)
