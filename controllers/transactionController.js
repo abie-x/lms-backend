@@ -22,9 +22,9 @@ const getTotalRevenue = async (req, res) => {
         // If there are no transactions, return 0 as total revenue
         const revenue = totalRevenue.length > 0 ? totalRevenue[0].total : 0;
 
-        res.status(200).json({ totalRevenue: revenue });
+        res.status(200).send({ totalRevenue: revenue });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching total revenue', error: error.message });
+        res.status(500).send({ message: 'Error fetching total revenue', error: error.message });
     }
 };
 
@@ -34,9 +34,9 @@ const getRecentTransactions = asyncHandler(async (req, res) => {
           .sort({ createdAt: -1 })
           .limit(25);
 
-      res.status(200).json(recentTransactions);
+      res.status(200).send(recentTransactions);
   } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).send({ message: 'Internal server error' });
   }
 });
 

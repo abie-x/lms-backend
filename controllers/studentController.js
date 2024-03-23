@@ -1044,9 +1044,9 @@ const getNumberOfAdmissions = async (req, res) => {
 
         console.log(`printing the number of admissions, ${numberOfAdmissions}`)
 
-        res.status(200).json({ numberOfAdmissions });
+        res.status(200).send({ numberOfAdmissions });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching number of admissions', error: error.message });
+        res.status(500).send({ message: 'Error fetching number of admissions', error: error.message });
     }
 };
 
@@ -1056,9 +1056,9 @@ const getRecentAdmissions = asyncHandler(async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(25);
 
-        res.status(200).json(recentAdmissions);
+        res.status(200).send(recentAdmissions);
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).send({ message: 'Internal server error' });
     }
 });
 

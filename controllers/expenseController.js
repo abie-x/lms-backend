@@ -24,7 +24,7 @@ const addExpense = asyncHandler(async (req, res) => {
         // No studentId associated with an expense
     });
 
-    res.status(201).json({ transaction });
+    res.status(201).send({ transaction });
 });
 
 const getTotalExpenses = asyncHandler(async (req, res) => {
@@ -44,9 +44,9 @@ const getTotalExpenses = asyncHandler(async (req, res) => {
         // Extract total expenses from the aggregation result
         const total = totalExpenses.length > 0 ? totalExpenses[0].total : 0;
 
-        res.status(200).json({ totalExpenses: total });
+        res.status(200).send({ totalExpenses: total });
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).send({ message: 'Internal server error' });
     }
 });
 
