@@ -28,4 +28,17 @@ const getTotalRevenue = async (req, res) => {
     }
 };
 
-export { getTotalRevenue };
+const getRecentTransactions = asyncHandler(async (req, res) => {
+  try {
+      const recentTransactions = await Transaction.find({})
+          .sort({ createdAt: -1 })
+          .limit(25);
+
+      res.status(200).json(recentTransactions);
+  } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+export { getTotalRevenue, getRecentTransactions };

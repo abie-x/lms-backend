@@ -1050,6 +1050,19 @@ const getNumberOfAdmissions = async (req, res) => {
     }
 };
 
+const getRecentAdmissions = asyncHandler(async (req, res) => {
+    try {
+        const recentAdmissions = await NiosStudent.find({})
+            .sort({ createdAt: -1 })
+            .limit(25);
+
+        res.status(200).json(recentAdmissions);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 
 
@@ -1063,5 +1076,6 @@ export {
     getStudentsCreatedToday,
     updateExistingStudent,
     buildPdf,
-    getNumberOfAdmissions
+    getNumberOfAdmissions,
+    getRecentAdmissions
 };
