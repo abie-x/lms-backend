@@ -19,6 +19,7 @@ const addExpense = asyncHandler(async (req, res) => {
     const transaction = await Transaction.create({
         amount: -amount, // Debit transaction, so amount is negative
         type: 'debit', // Debit transaction type
+        purpose: category,
         description: `Expense:${description ? description : ''}`, // Description includes "Expense:" prefix
         date,
         // No studentId associated with an expense

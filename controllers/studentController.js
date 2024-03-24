@@ -352,19 +352,25 @@ async function buildPdf(name, course, batch, phoneNumber, email, intake, admissi
         }
 }
 
-const createNewTransaction = async (studentId, amount, type) => {
+const createNewTransaction = async (studentId, amount, type, purpose, name, admissionNumber) => {
 
     console.log(`Printing the values assosiated with transactions..`)
     console.log(studentId)
     console.log(amount)
     console.log(type)
+    console.log(purpose)
+    console.log(name)
+    console.log(admissionNumber)
 
     try {
         const transaction = new Transaction({
             amount,
             type,
+            purpose,
             date: new Date(),
-            studentId
+            studentId,
+            studentName: name,
+            studentAdmissionNumber: admissionNumber
         });
 
         await transaction.save();
@@ -466,7 +472,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     niosStudent.save()
 
                     // Create a new transaction
-                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit'  );
+                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit', 'admissionFees', niosStudent.name, niosStudent.admissionNumber  );
 
                     // Send response with the created student
                     res.status(201).send(niosStudent);
@@ -476,7 +482,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     niosStudent.save()
 
                     // Create a new transaction
-                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit'  );
+                    createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit', 'admissionFees', niosStudent.name, niosStudent.admissionNumber   );
 
                     // Send response with the created student
                     res.status(201).send(niosStudent);

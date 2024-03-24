@@ -11,6 +11,10 @@ const transactionSchema = new mongoose.Schema(
             enum: ['credit', 'debit'], // Specify whether it's a credit or debit transaction
             required: true
         },
+        purpose: {
+            type: String,
+            required: true
+        },
         description: {
             type: String,
         },
@@ -21,6 +25,12 @@ const transactionSchema = new mongoose.Schema(
         studentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'NiosStudent' // Reference to the student for credit transactions
+        },
+        studentName: {
+            type: String
+        },
+        studentAdmissionNumber: {
+            type: String
         }
     },
     {
