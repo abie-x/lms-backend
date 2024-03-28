@@ -9,6 +9,11 @@ import { NiosStudent } from '../models/studentModel.js';
 const addExpense = asyncHandler(async (req, res) => {
   const { category, amount, description, date } = req.body;
 
+  console.log(category)
+  console.log(amount)
+  console.log(description)
+  console.log(date)
+
   try {
     const expense = await Expense.create({
       category,
@@ -30,7 +35,7 @@ const addExpense = asyncHandler(async (req, res) => {
     res.status(201).send({ transaction });
   } catch (error) {
     res.status(400);
-    throw new Error('Something went wrong!');
+    throw new Error(error);
   }
 });
 
