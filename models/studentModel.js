@@ -175,6 +175,21 @@ const niosStudentSchema = new mongoose.Schema(
             default: 'Admitted',
             enum: ['Fail', 'Pass', 'Dropout', 'Admitted', 'Other']
         },
+        registrationStatus: {
+            type: String,
+            required: true,
+            default: 'NotRegistered',
+            enum: ['Registered', 'NotRegistered']
+        },
+        academicStatus: {
+            type: String,
+            required: true,
+            default: 'pursuing',
+            enum: ['Pass', 'Fail', 'Cancelled', 'PartiallyCancelled', 'pursuing']
+        },
+        reasonForCancellation: {
+            type: String
+        },
         registrationStream: {
             type: String,
             enum: ['Stream1', 'Stream2', 'Stream3', 'Stream4']
@@ -210,6 +225,16 @@ const niosStudentSchema = new mongoose.Schema(
             required: true,
             default: false
         },
+        tocReceived: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        tocSubmitted: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
         optionalSubjectsExam: {
             type: Boolean,
             required: true,
@@ -221,7 +246,13 @@ const niosStudentSchema = new mongoose.Schema(
         tocSubjects: {
             type: [String],
         },
-        documentsSubmitted: {
+        
+        tmaReceived: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
+        tmaSubmitted: {
             type: Boolean,
             required: true,
             default: false

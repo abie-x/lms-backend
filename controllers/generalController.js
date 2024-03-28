@@ -17,7 +17,8 @@ const getAdmissionsData = async (startDate, endDate) => {
 const getTransactionData = async (category, startDate, endDate) => {
   // Define query based on the category
   let query;
-  console.log(category);
+  console.log(startDate);
+  console.log(endDate);
   switch (category) {
     case 'revenue':
       query = { type: 'credit', date: { $gte: startDate, $lte: endDate } };
@@ -36,8 +37,6 @@ const getDataByCategoryAndDuration = asyncHandler(async (req, res) => {
   try {
     // Get category and duration from request query parameters
     const { category, duration } = req.query;
-
-    console.log(category);
 
     // Get current date
     const currentDate = new Date();
@@ -70,7 +69,13 @@ const getDataByCategoryAndDuration = asyncHandler(async (req, res) => {
       case 'custom':
         // If custom duration is provided, use the start_date and end_date query parameters
         startDate = new Date(req.query.start_date);
-        endDate = new Date(req.query.end_date);
+        endDate = new Date(req.query.start_date);
+
+        // Set startDateTime to 12:00 AM
+        startDate.setHours(0, 0, 0, 0);
+
+        // Set endDateTime to 11:59 PM
+        endDate.setHours(23, 59, 59, 999);
         break;
       default:
         return res.status(400).json({ message: 'Invalid duration parameter' });

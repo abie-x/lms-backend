@@ -1108,6 +1108,67 @@ const getAdmissionsInfo = asyncHandler(async (req, res) => {
     }
 })
 
+const filterNiosStudents = async (req, res) => {
+    try {
+        // Receive filter object from the frontend
+        const filter = req.body; // Assuming filter object is sent in the request body
+
+        // Build the query object based on the provided filter
+        const query = {};
+
+        if (filter.year) {
+            query.year = filter.year;
+        }
+        if (filter.course) {
+            query.course = filter.course;
+        }
+        if (filter.mode) {
+            query.mode = filter.mode;
+        }
+        if (filter.pendingFee) {
+            query['feeDetails.totalAmount'] = { $gt: 0 }; // Assuming pending fee means totalAmount is greater than 0
+        }
+        if (filter.registrationStatus) {
+            query.registrationStatus = filter.registrationStatus;
+        }
+        if (filter.academicStatus) {
+            query.academicStatus = filter.academicStatus;
+        }
+        if (filter.examMonth) {
+            query.examMonth = filter.examMonth;
+        }
+        if (filter.examCentre) {
+            query.examCentre = filter.examCentre;
+        }
+        if (filter.tmaReceived !== undefined) {
+            query.tmaReceived = filter.tmaReceived;
+        }
+        if (filter.tmaSubmitted !== undefined) {
+            query.tmaSubmitted = filter.tmaSubmitted;
+        }
+        if (filter.toc !== undefined) {
+            query.toc = filter.toc;
+        }
+        if (filter.tocReceived !== undefined) {
+            query.tocReceived = filter.tocReceived;
+        }
+        if (filter.tocSubmitted !== undefined) {
+            query.tocSubmitted = filter.tocSubmitted;
+        }
+        // Add other filter criteria as needed
+
+        // Query the NIOS students collection based on the filter criteria
+        const filteredStudents = await NiosStudent.find(query).exec();
+
+        // Return the filtered results to the frontend
+        res.json(filteredStudents);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
 
 
 
@@ -1124,5 +1185,6 @@ export {
     buildPdf,
     getNumberOfAdmissions,
     getRecentAdmissions,
-    getAdmissionsInfo
+    getAdmissionsInfo,
+    filterNiosStudents
 };
