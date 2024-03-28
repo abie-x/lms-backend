@@ -8,7 +8,7 @@ const getAdmissionsData = async (startDate, endDate) => {
   const admissions = await NiosStudent.find({
     createdAt: { $gte: startDate, $lte: endDate },
   })
-    .select('_id name course admissionNumber')
+    .select('_id name course admissionNumber createdAt')
     .exec();
 
   return admissions;
