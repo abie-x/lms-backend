@@ -60,73 +60,75 @@ const getCategoryData = async (category, startDate, endDate) => {
     let query;
     switch (category) {
         case 'revenue':
-            
+            // For revenue, fetch transactions for the entire month
             query = { type: 'credit', date: { $gte: startDate, $lte: endDate } };
             break;
         case 'expense':
+            // For expense, fetch transactions for the entire month
             query = { type: 'debit', date: { $gte: startDate, $lte: endDate } };
             break;
         case 'admissions':
+            // For admissions, count the number of admissions within the date range
             return getAdmissionsCount(startDate, endDate);
     }
 
     const transactions = await Transaction.find(query).exec();
+    console.log(transactions.length)
     const totalAmount = getPositiveTotalAmount(transactions);
     return totalAmount;
 };
 
+
 const getTransactionsInfo = asyncHandler(async (req, res) => {
     try {
         const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth();
-        const currentDay = currentDate.getDate();
-        
-        // Create a new Date object with the same year, month, and day, but set the time to 12:00 AM
-        let startDate = new Date(currentYear, currentMonth, currentDay, 0, 0, 0, 0);
-        
-        // Set endDate to 11:59:59 PM
-        let endDate = new Date(currentYear, currentMonth, currentDay, 23, 59, 59, 999);
+        let startDate = new Date(currentDate); // Create a new variable for startDate
+        let endDate = new Date(currentDate);   // Create a new variable for endDate
 
-        console.log(startDate)
-        console.log(endDate)
+        // Get daily data
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
 
         const categories = ['admission', 'revenue', 'expense'];
         const data = {};
 
         for (const category of categories) {
             let dailyData, weeklyData, monthlyData;
+
+            // Get daily data
             if (category === 'admission') {
                 dailyData = await getAdmissionsCount(startDate, endDate);
             } else {
                 dailyData = await getCategoryData(category, startDate, endDate);
-                console.log(`${category} : ${dailyData}`)
             }
 
             // Get weekly data
-            startDate.setDate(startDate.getDate() - startDate.getDay()); // Start of the week (Sunday)
-            endDate.setDate(endDate.getDate() - endDate.getDay() + 6); // End of the week (Saturday)
-            endDate.setHours(23, 59, 59, 999);
+            const weekStartDate = new Date(startDate); // Create a new variable for weekStartDate
+            const weekEndDate = new Date(endDate);     // Create a new variable for weekEndDate
+            weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay());
+            weekEndDate.setDate(weekEndDate.getDate() - weekEndDate.getDay() + 6);
+            weekEndDate.setHours(23, 59, 59, 999);
 
             if (category === 'admission') {
-                weeklyData = await getAdmissionsCount(startDate, endDate);
+                weeklyData = await getAdmissionsCount(weekStartDate, weekEndDate);
             } else {
-                weeklyData = await getCategoryData(category, startDate, endDate);
-               
+                weeklyData = await getCategoryData(category, weekStartDate, weekEndDate);
             }
 
             // Get monthly data
-            startDate.setDate(1); // Start of the month
-            endDate.setMonth(endDate.getMonth() + 1); // Start of next month
-            endDate.setDate(0); // Last day of the current month
+            const monthStartDate = new Date(startDate); // Create a new variable for monthStartDate
+            const monthEndDate = new Date(endDate);     // Create a new variable for monthEndDate
+            monthStartDate.setDate(1);
+            monthEndDate.setMonth(monthEndDate.getMonth() + 1);
+            monthEndDate.setDate(0);
 
             if (category === 'admission') {
-                monthlyData = await getAdmissionsCount(startDate, endDate);
+                monthlyData = await getAdmissionsCount(monthStartDate, monthEndDate);
             } else {
-                monthlyData = await getCategoryData(category, startDate, endDate);
-               
+                monthlyData = await getCategoryData(category, monthStartDate, monthEndDate);
             }
 
+            // Store data for the category
             data[category] = { dailyData, weeklyData, monthlyData };
         }
 
@@ -136,6 +138,7 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 
