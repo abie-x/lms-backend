@@ -12,6 +12,7 @@ import courseRoutes from './routes/courseRoutes.js'
 import studentRoutes from './routes/studentRoutes.js'
 import transactionRoutes from './routes/transactionRoutes.js'
 import expenseRoutes from './routes/expenseRoutes.js'
+import generalRoutes from './routes/generalRoutes.js'
 
 //defining to use env variables in the project
 dotenv.config()
@@ -31,6 +32,7 @@ app.use('/api/course', courseRoutes)
 app.use('/api/students', studentRoutes)
 app.use('/api/transactions', transactionRoutes)
 app.use('/api/expense', expenseRoutes)
+app.use('/api/general', generalRoutes)
 
 //declaring the error handler and not found middlewares
 app.use(notFound)

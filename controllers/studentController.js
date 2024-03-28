@@ -474,6 +474,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
                     // Create a new transaction
                     createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit', 'admissionFees', niosStudent.name, niosStudent.admissionNumber  );
 
+                    console.log('hi')
+
                     // Send response with the created student
                     res.status(201).send(niosStudent);
                 } else {
@@ -483,6 +485,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
 
                     // Create a new transaction
                     createNewTransaction(niosStudent._id, parseInt(admissionFee), 'credit', 'admissionFees', niosStudent.name, niosStudent.admissionNumber   );
+
+                    console.log('hello')
 
                     // Send response with the created student
                     res.status(201).send(niosStudent);
@@ -1068,6 +1072,42 @@ const getRecentAdmissions = asyncHandler(async (req, res) => {
     }
 });
 
+const getAdmissionsCount =  (async (startDate, endDate) => {
+    const admissions = await NiosStudent.find({ createdAt: { $gte: startDate, $lte: endDate } }).exec();
+    return admissions.length
+})
+
+//using in the insights page in frontend
+const getAdmissionsInfo = asyncHandler(async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const startDate = new Date(currentDate);
+        const endDate = new Date(currentDate);
+        
+        // Get daily data
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        const dailyAdmissions = await getAdmissionsCount(startDate, endDate);
+
+        // Get weekly data
+        startDate.setDate(startDate.getDate() - startDate.getDay()); // Start of the week (Sunday)
+        endDate.setDate(endDate.getDate() - endDate.getDay() + 6); // End of the week (Saturday)
+        endDate.setHours(23, 59, 59, 999);
+        const weeklyAdmissions = await getAdmissionsCount(startDate, endDate);
+
+        // Get monthly data
+        startDate.setDate(1); // Start of the month
+        endDate.setMonth(endDate.getMonth() + 1); // Start of next month
+        endDate.setDate(0); // Last day of the current month
+        const monthlyAdmissions = await getAdmissionsCount(startDate, endDate);
+
+        res.json({ dailyData: dailyAdmissions, weeklyData: weeklyAdmissions, monthlyData: monthlyAdmissions });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+})
+
 
 
 
@@ -1083,5 +1123,6 @@ export {
     updateExistingStudent,
     buildPdf,
     getNumberOfAdmissions,
-    getRecentAdmissions
+    getRecentAdmissions,
+    getAdmissionsInfo
 };
