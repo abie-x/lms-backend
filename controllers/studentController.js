@@ -1192,6 +1192,34 @@ const filterNiosStudents = async (req, res) => {
     }
 };
 
+const getStudentByNumber = async (req, res) => {
+    try {
+        // Extract the admission number or phone number from the query parameters
+        const { number } = req.params
+
+        if(number.length === 10) {
+            let student = await NiosStudent.findOne({ phoneNumber: number }).exec();
+            if (student) {
+                return res.json(student);
+            } else {
+                return res.status(404).json({ message: 'Student not found' });
+            }
+        } else if(number.length < 10) {
+            let student = await NiosStudent.findOne({admissionNumber: number}).exec();
+            if (student) {
+                return res.json(student);
+            } else {
+                return res.status(404).json({ message: 'Student not found' });
+            }
+        } else {
+            return res.status(400).json({ message: 'Invalid admission number or phone number provided' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 
 
 
@@ -1211,5 +1239,6 @@ export {
     getNumberOfAdmissions,
     getRecentAdmissions,
     getAdmissionsInfo,
-    filterNiosStudents
+    filterNiosStudents,
+    getStudentByNumber
 };
