@@ -31,6 +31,9 @@ const transactionSchema = new mongoose.Schema(
         },
         studentAdmissionNumber: {
             type: String
+        },
+        utrNumber: {
+            type: String
         }
     },
     {

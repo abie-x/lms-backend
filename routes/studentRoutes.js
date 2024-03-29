@@ -1,5 +1,5 @@
 import express from 'express'
-import { createNiosStudent, niosFeePay, getStudentDetails, updateStudent, getStudentsWithUnpaidFees, getStudentsCreatedToday, updateExistingStudent, fetchStudentDetailsById, getNumberOfAdmissions, getRecentAdmissions, getAdmissionsInfo, filterNiosStudents, getStudentByNumber } from '../controllers/studentController.js'
+import { createNiosStudent, niosFeePay, getStudentDetails, updateStudent, getStudentsWithUnpaidFees, getStudentsCreatedToday, updateExistingStudent, fetchStudentDetailsById, getNumberOfAdmissions, getRecentAdmissions, getAdmissionsInfo, filterNiosStudents, getStudentByNumber, getStudentTransactions } from '../controllers/studentController.js'
 import { protect, admin } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
@@ -18,5 +18,6 @@ router.get('/new-admissions', protect, admin, getStudentsCreatedToday)
 router.get('/admissions/info', getAdmissionsInfo)
 router.post('/filterStudents', filterNiosStudents)
 router.get('/search/:number', getStudentByNumber)
+router.get('/studentTransactions/:number', getStudentTransactions)
 
 export default router

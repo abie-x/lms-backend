@@ -139,60 +139,42 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
     }
 });
 
+const addRevenue = asyncHandler(async (req, res) => {
+    const { category, amount, description, date } = req.body;
+  
+    console.log(category)
+    console.log(amount)
+    console.log(description)
+    console.log(date)
+  
+    try {
+    //   const expense = await Transaction.create({
+    //     category,
+    //     amount,
+    //     description,
+    //     date,
+    //   });
+  
+      // Create a transaction for the expense
+      const transaction = await Transaction.create({
+        amount: amount, 
+        type: 'credit', 
+        purpose: category,
+        description: `Revenue:${description ? description : ''}`, 
+        date,
+      });
+  
+      res.status(201).send({ transaction });
+    } catch (error) {
+      res.status(400);
+      throw new Error(error);
+    }
+  });
 
 
 
-// const getCategoryData = async (category, startDate, endDate) => {
-//     let query;
-//     switch (category) {
-//         case 'revenue':
-//             query = { type: 'credit', date: { $gte: startDate, $lte: endDate } };
-//             break;
-//         case 'expense':
-//             query = { type: 'debit', date: { $gte: startDate, $lte: endDate } };
-//             break;
-//     }
-
-//     const transactions = await Transaction.find(query).exec();
-//     const totalAmount = getPositiveTotalAmount(transactions);
-//     return totalAmount;
-// }
-
-// const getTransactionsInfo = asyncHandler(async (req, res) => {
-//     try {
-//         const category = req.query.category;
-
-//         if (!category || !['revenue', 'expense'].includes(category)) {
-//             return res.status(400).json({ message: 'Invalid category parameter' });
-//         }
-
-//         const currentDate = new Date();
-//         const startDate = new Date(currentDate);
-//         const endDate = new Date(currentDate);
-        
-//         // Get daily data
-//         startDate.setHours(0, 0, 0, 0);
-//         endDate.setHours(23, 59, 59, 999);
-//         const dailyData = await getCategoryData(category, startDate, endDate);
-
-//         // Get weekly data
-//         startDate.setDate(startDate.getDate() - startDate.getDay()); // Start of the week (Sunday)
-//         endDate.setDate(endDate.getDate() - endDate.getDay() + 6); // End of the week (Saturday)
-//         endDate.setHours(23, 59, 59, 999);
-//         const weeklyData = await getCategoryData(category, startDate, endDate);
-
-//         // Get monthly data
-//         startDate.setDate(1); // Start of the month
-//         endDate.setMonth(endDate.getMonth() + 1); // Start of next month
-//         endDate.setDate(0); // Last day of the current month
-//         const monthlyData = await getCategoryData(category, startDate, endDate);
-
-//         res.json({ dailyData, weeklyData, monthlyData });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Internal Server Error' });
-//     }
-// })
 
 
-export { getTotalRevenue, getRecentTransactions, getTransactionsInfo };
+
+
+export { getTotalRevenue, getRecentTransactions, getTransactionsInfo, addRevenue };
