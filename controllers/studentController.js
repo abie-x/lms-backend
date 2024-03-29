@@ -1126,7 +1126,31 @@ const filterNiosStudents = async (req, res) => {
             query.mode = filter.mode;
         }
         if (filter.pendingFee) {
-            query['feeDetails.totalAmount'] = { $gt: 0 }; // Assuming pending fee means totalAmount is greater than 0
+            const feeQuery = {};
+
+            // Check for specific fees
+            if (filter.pendingFee  === 'admissionFees') {
+                query['feeDetails.admissionFeePaid'] = { $exists: true, $eq: false };
+            }
+            if (filter.pendingFee === 'registrationFees') {
+                query['feeDetails.registrationFeePaid'] = { $exists: true, $eq: false };
+            }
+            if (filter.pendingFee === 'examFees') {
+                query['feeDetails.examFeePaid'] = { $exists: true, $eq: false };
+            }
+            if (filter.pendingFee === 'firstTerm') {
+                query['feeDetails.installments.1.isPaid'] = { $exists: true, $eq: false };
+            }
+            if (filter.pendingFee === 'secondTerm') {
+                query['feeDetails.installments.2.isPaid'] = { $exists: true, $eq: false };
+            }
+            if (filter.pendingFee === 'thirdTerm') {
+                query['feeDetails.installments.3.isPaid'] = { $exists: true, $eq: false };
+            }
+            // Add other fee types as needed
+
+            // Add fee query to the main query
+            // query['feeDetails.installments'] = { $elemMatch: feeQuery };
         }
         if (filter.registrationStatus) {
             query.registrationStatus = filter.registrationStatus;
@@ -1167,6 +1191,7 @@ const filterNiosStudents = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 
