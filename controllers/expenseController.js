@@ -80,12 +80,14 @@ const getExpenseOnDuration = asyncHandler(async (req, res) => {
   
         case 'this_week':
           startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
           startDate.setDate(startDate.getDate() - startDate.getDay());
           endDate = new Date();
           endDate.setDate(endDate.getDate() - endDate.getDay() + 6);
           break;
         case 'this_month':
           startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
           startDate.setDate(1);
           endDate = new Date();
           endDate.setMonth(endDate.getMonth() + 1);

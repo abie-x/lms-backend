@@ -22,6 +22,8 @@ const registerNios = asyncHandler(async (req, res) => {
         installments,
       } = req.body;
 
+      console.log(mode)
+
       const fee = await NiosFee.create({
         year,
         intake,

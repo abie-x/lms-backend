@@ -23,7 +23,7 @@ const niosFeeSchema = new mongoose.Schema(
         mode: {
             type: String,
             required: true,
-            enum: ['Online', 'Offline']
+            enum: ['Online', 'Offline', 'Correspondent']
         },
         examFees: {
             type: Number,
@@ -56,15 +56,12 @@ const niosFeeSchema = new mongoose.Schema(
             {
                 installmentNumber: {
                     type: Number,
-                    required: true
                 },
                 dueDate: {
                     type: Date,
-                    required: true
                 },
                 amount: {
                     type: Number,
-                    required: true
                 }
             }
         ]

@@ -748,6 +748,18 @@ const niosFeePay = asyncHandler(async (req, res) => {
   console.log(amount);
   console.log(`feeName: ${feeName}`);
 
+  let tuitionFeeName
+
+  if(installmentNumber) {
+    if(installmentNumber === 1) {
+      tuitionFeeName = 'First term fees'
+    } else if(installmentNumber === 2) {
+      tuitionFeeName = 'Second term fees'
+    } else if(installmentNumber === 3) {
+      tuitionFeeName = 'Third term fees'
+    }
+  }
+
   // Find the student based on phoneNumber or email
   let student;
 
@@ -770,6 +782,7 @@ const niosFeePay = asyncHandler(async (req, res) => {
     //do soemthing related to custom fee payment
     // Add custom fee to student record
     student.feeDetails.customFees.push({ feeName, amount });
+    student.feeDetails.paidAmount += amount
     createTransaction(
         student._id,
         amount,
@@ -875,6 +888,9 @@ const niosFeePay = asyncHandler(async (req, res) => {
       let outstandingAmount =
         installmentToPay.amount - installmentToPay.paidAmount;
 
+        console.log(`outstanding payment ${outstandingAmount}`)
+        console.log(`installment to pay ${installmentToPay}`)
+
       if (installmentToPay) {
         if (installmentToPay.isPaid === true) {
           throw new Error('Student already paid this installment');
@@ -891,7 +907,7 @@ const niosFeePay = asyncHandler(async (req, res) => {
           createTransaction(
             student._id,
             amount,
-            'tuition fees',
+            tuitionFeeName,
             utrNumber,
             student.admissionNumber,
             student.name
@@ -1154,6 +1170,7 @@ const filterNiosStudents = async (req, res) => {
   try {
     // Receive filter object from the frontend
     const filter = req.body; // Assuming filter object is sent in the request body
+    console.log(filter)
 
     // Build the query object based on the provided filter
     const query = {};
@@ -1181,19 +1198,19 @@ const filterNiosStudents = async (req, res) => {
         query['feeDetails.examFeePaid'] = { $exists: true, $eq: false };
       }
       if (filter.pendingFee === 'firstTerm') {
-        query['feeDetails.installments.1.isPaid'] = {
+        query['feeDetails.installments.0.isPaid'] = {
           $exists: true,
           $eq: false,
         };
       }
       if (filter.pendingFee === 'secondTerm') {
-        query['feeDetails.installments.2.isPaid'] = {
+        query['feeDetails.installments.1.isPaid'] = {
           $exists: true,
           $eq: false,
         };
       }
       if (filter.pendingFee === 'thirdTerm') {
-        query['feeDetails.installments.3.isPaid'] = {
+        query['feeDetails.installments.2.isPaid'] = {
           $exists: true,
           $eq: false,
         };

@@ -45,15 +45,12 @@ const feeDetailsSchema = new mongoose.Schema(
             {
                 installmentNumber: {
                     type: Number,
-                    required: true
                 },
                 dueDate: {
                     type: Date,
-                    required: true
                 },
                 amount: {
                     type: Number,
-                    required: true
                 },
                 paidAmount: {
                     type: Number,
@@ -184,8 +181,8 @@ const niosStudentSchema = new mongoose.Schema(
         academicStatus: {
             type: String,
             required: true,
-            default: 'pursuing',
-            enum: ['Pass', 'Fail', 'Cancelled', 'PartiallyCancelled', 'pursuing']
+            default: 'Pursuing',
+            enum: ['Pass', 'Fail', 'Cancelled', 'PartiallyCancelled', 'Pursuing']
         },
         reasonForCancellation: {
             type: String

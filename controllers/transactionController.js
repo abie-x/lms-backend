@@ -58,18 +58,18 @@ const getAdmissionsCount = async (startDate, endDate) => {
 
 const getCategoryData = async (category, startDate, endDate) => {
     let query;
+    console.log(`category: ${category}`)
     switch (category) {
         case 'revenue':
             // For revenue, fetch transactions for the entire month
             query = { type: 'credit', date: { $gte: startDate, $lte: endDate } };
+            console.log(query)
             break;
         case 'expense':
             // For expense, fetch transactions for the entire month
             query = { type: 'debit', date: { $gte: startDate, $lte: endDate } };
             break;
-        case 'admissions':
-            // For admissions, count the number of admissions within the date range
-            return getAdmissionsCount(startDate, endDate);
+        
     }
 
     const transactions = await Transaction.find(query).exec();
@@ -103,11 +103,17 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
             }
 
             // Get weekly data
-            const weekStartDate = new Date(startDate); // Create a new variable for weekStartDate
-            const weekEndDate = new Date(endDate);     // Create a new variable for weekEndDate
+            const weekStartDate = new Date(currentDate); // Create a new variable for weekStartDate
+            weekStartDate.setHours(0, 0, 0, 0)
+            
+            const weekEndDate = new Date(currentDate);     // Create a new variable for weekEndDate
             weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay());
             weekEndDate.setDate(weekEndDate.getDate() - weekEndDate.getDay() + 6);
             weekEndDate.setHours(23, 59, 59, 999);
+
+            // console.log(`printing weekly datas`)
+            // console.log(weekStartDate)
+            // console.log(weekEndDate)
 
             if (category === 'admission') {
                 weeklyData = await getAdmissionsCount(weekStartDate, weekEndDate);
@@ -121,6 +127,10 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
             monthStartDate.setDate(1);
             monthEndDate.setMonth(monthEndDate.getMonth() + 1);
             monthEndDate.setDate(0);
+
+            // console.log(`printing monthy dates`)
+            // console.log(monthStartDate)
+            // console.log(monthEndDate)
 
             if (category === 'admission') {
                 monthlyData = await getAdmissionsCount(monthStartDate, monthEndDate);
@@ -141,7 +151,6 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
 
 const addRevenue = asyncHandler(async (req, res) => {
     const { category, amount, description, date } = req.body;
-  
     console.log(category)
     console.log(amount)
     console.log(description)
