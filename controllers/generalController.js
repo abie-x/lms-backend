@@ -4,6 +4,8 @@ import { Transaction } from '../models/transactionModel.js';
 import { NiosStudent } from '../models/studentModel.js';
 
 const getAdmissionsData = async (startDate, endDate) => {
+  console.log(startDate)
+  console.log(endDate)
   // Fetch admissions data based on the provided date range
   const admissions = await NiosStudent.find({
     createdAt: { $gte: startDate, $lte: endDate },
@@ -42,6 +44,7 @@ const getDataByCategoryAndDuration = asyncHandler(async (req, res) => {
     const currentDate = new Date();
     let startDate = new Date(currentDate);
     let endDate = new Date(currentDate);
+    
 
     // Determine start and end dates based on duration
     switch (duration) {
@@ -54,6 +57,7 @@ const getDataByCategoryAndDuration = asyncHandler(async (req, res) => {
       case 'this_week':
         // Set start date to beginning of the current week (Sunday)
         startDate.setDate(startDate.getDate() - startDate.getDay());
+        startDate.setHours(0, 0, 0, 0);
         // Set end date to end of the current week (Saturday)
         endDate.setDate(endDate.getDate() - endDate.getDay() + 6);
         endDate.setHours(23, 59, 59, 999);
@@ -61,6 +65,7 @@ const getDataByCategoryAndDuration = asyncHandler(async (req, res) => {
       case 'this_month':
         // Set start date to beginning of the current month
         startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
         // Set end date to end of the current month
         endDate.setMonth(endDate.getMonth() + 1);
         endDate.setDate(0);

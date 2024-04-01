@@ -122,11 +122,13 @@ const getTransactionsInfo = asyncHandler(async (req, res) => {
             }
 
             // Get monthly data
-            const monthStartDate = new Date(startDate); // Create a new variable for monthStartDate
+            const monthStartDate = new Date(currentDate); // Create a new variable for monthStartDate
             const monthEndDate = new Date(endDate);     // Create a new variable for monthEndDate
             monthStartDate.setDate(1);
+            monthStartDate.setHours(0, 0, 0, 0)
             monthEndDate.setMonth(monthEndDate.getMonth() + 1);
             monthEndDate.setDate(0);
+            monthEndDate.setHours(23, 59, 59, 999)
 
             // console.log(`printing monthy dates`)
             // console.log(monthStartDate)
