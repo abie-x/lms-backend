@@ -991,20 +991,20 @@ const fetchStudentDetailsById = asyncHandler(async (req, res) => {
 //step3: add these details and modify the existing student details
 //step4: if success, send the response back to the customer
 const updateExistingStudent = asyncHandler(async (req, res) => {
-  const studentId = req.params.id;
+  const admissionNumber = req.body.admissionNumber;
   const updatedFields = req.body;
 
   console.log(`updated fields are ${updatedFields}`);
 
-  const student = await NiosStudent.findByIdAndUpdate(
-    studentId,
+  const student = await NiosStudent.findOneAndUpdate(
+    { admissionNumber: admissionNumber },
     {
       $set: updatedFields,
     },
     { new: true }
   );
 
-  console.log(student);
+  student.save()
 
   if (student) {
     res.status(200).send(student);
@@ -1043,6 +1043,10 @@ const updateStudent = asyncHandler(async (req, res) => {
     throw new Error('Error updating the student record');
   }
 });
+
+// const modifyStudentData = asyncHandler (asyn (req, res) => {
+
+// })
 
 //-------------
 const getStudentsWithUnpaidFees = asyncHandler(async (req, res) => {
@@ -1322,6 +1326,32 @@ const getStudentTransactions = asyncHandler(async (req, res) => {
   }
 });
 
+const getLatestAdmissionsCount = asyncHandler(async (req, res) => {
+  try {
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000); // Calculate timestamp 48 hours ago
+
+    console.log(`printing fourtyyears time stamp ${fortyEightHoursAgo}`)
+
+    // Count SSLC admissions created in the past 48 hours
+    const sslcCount = await NiosStudent.countDocuments({
+      createdAt: { $gte: fortyEightHoursAgo },
+      'course': 'SSLC'
+    });
+
+    // Count Plus2 admissions created in the past 48 hours
+    const plus2Count = await NiosStudent.countDocuments({
+      createdAt: { $gte: fortyEightHoursAgo },
+      'course': 'Plustwo'
+    });
+
+    // Send the counts as JSON response
+    res.json({ sslcCount, plus2Count });
+  } catch (error) {
+    console.error('Error fetching admissions count:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
 export {
   createNiosStudent,
   niosFeePay,
@@ -1338,4 +1368,5 @@ export {
   filterNiosStudents,
   getStudentByNumber,
   getStudentTransactions,
+  getLatestAdmissionsCount
 };

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const expenseSchema = new mongoose.Schema({
     category: {
         type: String,
-        enum: ['Salary', 'Rent', 'Printing & Stationary', 'Refreshment', 'Electricity', 'Repairs', 'Equipments', 'Miscellaneous Expense', 'Exam Fees', 'Registration Fees'],
+        enum: ['Salary', 'Rent', 'PrintingandStationary', 'Refreshment', 'Electricity', 'Repairs', 'Equipments', 'Miscellaneous Expense', 'Exam Fees', 'Registration Fees'],
         required: true
     },
     amount: {
