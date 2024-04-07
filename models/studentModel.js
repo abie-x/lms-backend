@@ -195,7 +195,7 @@ const niosStudentSchema = new mongoose.Schema(
             type: String,
             enum: ['Normal exam', 'Ondemand exam']
         },
-        exaMonth: { 
+        examMonth: { 
             type: String, //we might need to change the type to array of strings later. 
             enum: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         },
