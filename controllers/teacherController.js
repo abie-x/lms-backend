@@ -7,7 +7,7 @@ import { generateToken } from "../utils/generateToken.js";
 //route => POST /api/teachers/admin
 //access => private(admin)
 const registerAdmin = asyncHandler(async (req, res) => {
-    const {name, phoneNumber, email, password } = req.body
+    const {name, phoneNumber, email, password, role } = req.body
 
     console.log(email)
     console.log(password)
@@ -24,6 +24,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
         phoneNumber,
         email,
         password,
+        role,
         isAdmin: true
     })
 
@@ -34,6 +35,7 @@ const registerAdmin = asyncHandler(async (req, res) => {
             phoneNumber: admin.phoneNumber,
             email: admin.email,
             isAdmin: admin.isAdmin,
+            role: admin.role,
             token: generateToken(admin._id)
         })
     } else {
@@ -70,15 +72,16 @@ const loginAdmin = asyncHandler(async (req, res) => {
 //route => POST /api/teachers/register
 //access => private (admin only)
 const registerTeachers = asyncHandler(async (req, res) => {
-    const {name, phoneNumber, email, password } = req.body
+    const {name, phoneNumber, email, password, role } = req.body
 
     console.log(email)
     console.log(password)
+    console.log(`printing the role of the teacher ${role}`)
 
     const teacherExist = await Teacher.findOne({email})
 
     if(teacherExist) {
-        res.status(400)
+        // res.status(400)
         throw new Error('Teacher already exists')
     }
 
@@ -87,6 +90,7 @@ const registerTeachers = asyncHandler(async (req, res) => {
         phoneNumber,
         email,
         password,
+        role
     })
 
     if(teacher) {
@@ -96,6 +100,7 @@ const registerTeachers = asyncHandler(async (req, res) => {
             phoneNumber: teacher.phoneNumber,
             email: teacher.email,
             isAdmin: teacher.isAdmin,
+            tole: teacher.role,
             token: generateToken(teacher._id)
         })
     } else {
@@ -194,6 +199,39 @@ const testTeacherApi = asyncHandler(async (req, res) => {
     res.status(200).send("API working correctly")
 })
 
+//api to show the list of all teachers in thr organization
+const showAllTeachers = asyncHandler(async (req, res) => {
+    const teachers = await Teacher.find({})
+    res.send(teachers)
+})
+
+const deleteTeacherHandler = asyncHandler(async (req, res) => {
+    console.log(req.params)
+    try {
+        const { teacherId } = req.params
+    
+        // Check if teacherId is provided
+        if (!teacherId) {
+          return res.status(400).json({ message: 'Teacher ID is required' });
+        }
+    
+        // Find the teacher by ID and delete
+        const deletedTeacher = await Teacher.findByIdAndDelete(teacherId);
+    
+        // Check if teacher with provided ID exists
+        if (!deletedTeacher) {
+          return res.status(404).json({ message: 'Teacher not found' });
+        }
+    
+        // Send success response
+        res.status(200).json({ message: 'Teacher deleted successfully' });
+      } catch (error) {
+        // Handle errors
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+})
+
 export {
     loginAdmin,
     registerAdmin,
@@ -202,6 +240,8 @@ export {
     testTeacherApi,
     getTeacherData,
     resetPassword,
-    deleteTeacher
+    deleteTeacher,
+    showAllTeachers,
+    deleteTeacherHandler
 }
 

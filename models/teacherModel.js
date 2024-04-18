@@ -23,6 +23,11 @@ const teachersSchema = mongoose.Schema(
             type: Boolean,
             required: true,
             default: false
+        },
+        role: {
+            type: String,
+            required: true,
+            enum: ['Admin', 'GM', 'Tutor']
         }
     }, 
     {
