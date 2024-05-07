@@ -994,6 +994,8 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
   const admissionNumber = req.body.admissionNumber;
   const updatedFields = req.body;
 
+  console.log(updatedFields)
+
   console.log(`updated fields are ${updatedFields}`);
 
   const student = await NiosStudent.findOneAndUpdate(
@@ -1001,15 +1003,18 @@ const updateExistingStudent = asyncHandler(async (req, res) => {
     {
       $set: updatedFields,
     },
-    { new: true }
-  );
+    { new: true } // To return the updated document
+);
+
+console.log(student)
+
 
   student.save()
 
   if (student) {
     res.status(200).send(student);
   } else {
-    res.status(400).send('Student not found');
+    res.status(400).send('Student not found');  
   }
 });
 
@@ -1022,7 +1027,7 @@ const updateStudent = asyncHandler(async (req, res) => {
 
   console.log(updatedFields);
 
-  // Update the student document
+  // Update the student document    
   const student = await NiosStudent.findByIdAndUpdate(
     studentId,
     updatedFields,
@@ -1030,7 +1035,7 @@ const updateStudent = asyncHandler(async (req, res) => {
   );
 
   student.feeDetails.examFees = updatedFields.examFees;
-  student.feeDetails.registrationFees = updatedFields.registrationFees;
+  student.feeDetails.registrationFees = updatedFields.registrationFees;   
 
   student.save();
 

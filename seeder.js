@@ -38,7 +38,7 @@ const destroyData = async () => {
     // await NiosFee.deleteMany()
     // await Teacher.deleteMany()
 
-    await Transaction.deleteMany()
+    await NiosStudent.deleteMany()
 
     console.log('Data Destroyed!'.red.inverse)
     process.exit()
