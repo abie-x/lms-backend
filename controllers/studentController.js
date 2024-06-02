@@ -25,14 +25,17 @@ async function buildPdf(
   admissionFees,
   examFees,
   examFeeDueDate,
+  admissionFeeDueDate,
   installments,
   registrationfees,
   registrationFeeDueDate,
   totalFee,
-  paidFee
+  paidFee,
+  admissionNumber,
+  mode,
 ) {
-  console.log('hey, cool');
-  console.log(email);
+
+  console.log(`printing the adm due ${admissionFeeDueDate}`)
 
   // const inputDateString = registrationFeeDueDate
   // const dateObject = new Date(inputDateString)
@@ -59,7 +62,7 @@ async function buildPdf(
     doc.fillColor('blue');
 
     // doc.image('/workspace/controllers/test.png', 250, 0, {fit: [100, 100], align: 'center' })
-    doc.text('LINFIELD EDUVERSE', 70, 70, { align: 'center' });
+    doc.text('Linfield Eduverse', 70, 70, { align: 'center',bold: true });
 
     // const logoPath = path.join(__dirname, '..', 'google-icon.svg');// Replace with the actual path to your logo image
 
@@ -84,15 +87,14 @@ async function buildPdf(
 
     doc.fillColor('blue').text('Billed to', 50, 130);
     doc.fillColor('black');
-    doc.text(name, 50, 150);
+    doc.text(`${name} (${admissionNumber})`, 50, 150);
     doc.text(`${course} ${batch ? batch : ''} (${intake})`, 50, 170);
     doc.text(email, 50, 190);
     doc.text(phoneNumber, 50, 210);
 
     // doc.fontSize(12)
     // doc.text(`Hey ${name}!`, 40, 110)
-    // doc.text(`A hearty welcome to the Linfield family! We're absolutely delighted to have you on board as a new member of our vibrant academic community.`, 40, 130)
-    // doc.text(`Your educational journey with us is about to unfold, and we're committed to making it an experience filled with knowledge, growth, and memorable moments. As you set foot into the world of learning, we want to ensure that you have all the information you need regarding the fee structure for the upcoming academic session.`), 40, 150
+    // doc.text(`A hearty welcome to the Linfield family! We' unfold, and we're committed to making it an experience filled with knowledge, growth, and memorable moments. As you set foot into the world of learning, we want to ensure that you have all the information you need regarding the fee structure for the upcoming academic session.`), 40, 150
 
     doc.strokeColor('blue');
     const lineY = doc.y + 20;
@@ -108,35 +110,68 @@ async function buildPdf(
     // doc.text('Payment ID', 450, tableY, { align: 'left' });
 
     doc.text('Fee Type', 50, tableY);
-    doc.text('Amount', 275, tableY);
-    doc.text('Due date', 475, tableY);
+    doc.text('Outstanding Amount', 275, tableY);
+    doc.text('Due date', 370, tableY);
 
     doc.fillColor('black');
 
     doc.text('Admission fees', 50, tableY + 20);
     doc.text(admissionFees, 280, tableY + 20);
-    doc.text('Paid', 475, tableY + 20);
+    doc.text(admissionFeeDueDate, 370, tableY + 20);
 
-    doc.text('First Term fees', 50, tableY + 40);
-    doc.text(installments[0].amount, 280, tableY + 40);
-    doc.text(getDates(installments[0].dueDate), 475, tableY + 40);
+    if(mode === 'Correspondent') {
 
-    doc.text('Second Term fees', 50, tableY + 60);
-    doc.text(installments[1].amount, 280, tableY + 60);
-    doc.text(getDates(installments[1].dueDate), 475, tableY + 60);
+      doc.text('Registration fees', 50, tableY + 40);
+      doc.text(registrationfees, 280, tableY + 40);
+      doc.text(registrationFeeDueDate, 370, tableY + 40);
 
-    doc.text('Third Term fees', 50, tableY + 80);
-    doc.text(installments[2].amount, 280, tableY + 80);
-    doc.text(getDates(installments[2].dueDate), 475, tableY + 80);
+      doc.text('Exam fees', 50, tableY + 60);
+      doc.text(examFees, 280, tableY + 60);
+      doc.text(examFeeDueDate, 370, tableY + 60);
 
-    doc.text('Registration fees', 50, tableY + 100);
-    doc.text(registrationfees, 280, tableY + 100);
-    doc.text(examFeeDueDate, 475, tableY + 100);
+    } else if (mode === 'Online') {
 
-    doc.text('Exam fees', 50, tableY + 120);
-    doc.text(examFees, 280, tableY + 120);
-    // doc.text(getDates(examFeeDueDate), 475, tableY + 120)
-    doc.text(examFeeDueDate, 475, tableY + 120);
+      doc.text('First Term fees', 50, tableY + 40);
+      doc.text(installments[0].amount, 280, tableY + 40);
+      doc.text(getDates(installments[0].dueDate), 370, tableY + 40);
+
+      doc.text('Second Term fees', 50, tableY + 60);
+      doc.text(installments[1].amount, 280, tableY + 60);
+      doc.text(getDates(installments[1].dueDate), 370, tableY + 60);
+
+      doc.text('Third Term fees', 50, tableY + 80);
+      doc.text(installments[2].amount, 280, tableY + 80);
+      doc.text(getDates(installments[2].dueDate), 370, tableY + 80);
+
+      doc.text('Registration fees', 50, tableY + 100);
+      doc.text(registrationfees, 280, tableY + 100);
+      doc.text(registrationFeeDueDate, 370, tableY + 100);
+
+      doc.text('Exam fees', 50, tableY + 120);
+      doc.text(examFees, 280, tableY + 120);
+      // doc.text(getDates(examFeeDueDate), 475, tableY + 120)
+      doc.text(examFeeDueDate, 370, tableY + 120);
+
+    } else if(mode === 'Offline') {
+      doc.text('First Term fees', 50, tableY + 40);
+      doc.text(installments[0].amount, 280, tableY + 40);
+      doc.text(getDates(installments[0].dueDate), 370, tableY + 40);
+
+      doc.text('Second Term fees', 50, tableY + 60);
+      doc.text(installments[1].amount, 280, tableY + 60);
+      doc.text(getDates(installments[1].dueDate), 370, tableY + 60);
+
+      doc.text('Registration fees', 50, tableY + 80);
+      doc.text(registrationfees, 280, tableY + 80);
+      doc.text(registrationFeeDueDate, 370, tableY + 80);
+
+      doc.text('Exam fees', 50, tableY + 100);
+      doc.text(examFees, 280, tableY + 100);
+      // doc.text(getDates(examFeeDueDate), 475, tableY + 120)
+      doc.text(examFeeDueDate, 370, tableY + 100);
+    }
+
+    
     doc.fontSize(12);
     // doc.text('Registration Fees', 50, tableY + 20, { align: 'left' });
     // doc.text('Online', 220, tableY + 20, { align: 'left' });
@@ -245,8 +280,8 @@ async function buildPdf(
       port: 465,
       secure: true,
       auth: {
-        user: 'hellolinfield@gmail.com',
-        pass: 'vtubtgatbgjltgqe',
+        user: 'abhiramzmenon@gmail.com',
+        pass: 'rsgwlnlrmsthvwqt',
       },
       // auth: {
       //      user: 'abhiramzmenon@gmail.com',
@@ -289,6 +324,12 @@ async function buildPdf(
                       font-size: 16px;
                       margin-bottom: 20px;
                     }
+                    .message-points {
+                      line-height: 0.5;
+                    }
+                    .Message-points-parent {
+                      line-height: 0.7;
+                    }
                     .signature {
                         font-style: italic;
                     }
@@ -301,13 +342,31 @@ async function buildPdf(
                     </div>
                     <div class="message">
                       <p>Dear ${name},</p>
-                      <p>Welcome to Linfield! I'm Nishad, the founder at Linfield, and I'm thrilled to have you join our community. At Linfield, we're dedicated to creating a supportive and engaging learning environment where every student can thrive.</p>
-                      <p>As you start on this journey with us, know that you have a team of teachers, staff, and fellow students here to support you along the way.</p>
-                      <p>While starting something new may feel daunting, remember that it's also an exciting opportunity for growth and discovery.</p>
-                      <p>Be curious, be kind, and be courageous. Embrace challenges as opportunities to learn and grow, and don't hesitate to seek help when you need it.</p>
-                      <p>I'm eager to see the incredible things you'll accomplish during your time at Linfield.</p>
-                      <p>Welcome aboard, and let's make your educational journey at Linfield truly remarkable!</p>
-                      <p>Attached below is the fee payment schedule for your reference.</p>
+                      <p>അഡ്മിഷൻ എടുക്കുന്ന സമയത്ത് താഴെ പറയുന്ന വിവരങ്ങൾ പൂർണമായും ഉറപ്പുവരുത്തുക.</p>
+
+                      <div class='message-points'>
+                        <p>*ക്ലാസ് സമയം </p>
+                        <p>*മൊത്തം ഫീസ്</p>
+                        <p>*പഠിക്കേണ്ട വിഷയങ്ങൾ</p>
+                      </div>
+
+                      <br />
+
+                      <div class="message-points-parent">
+                        <p>→ അഡ്‌മിഷൻ എടുക്കുമ്പോൾ ഉപയോഗിക്കുന്ന ഫോൺ നമ്പർ & മെയിൽ ഐഡി മാറ്റുവാൻ പാടുകയില്ല.</p>
+                        <p>→ അഡ്‌മിഷൻ എടുക്കുന്നത് parents / Guardian ഇവരുടെ പരിപൂർണ്ണ ഉത്തരവാദിത്ത്വത്തോടെ ആയിരിക്കണം.</p>
+                        <p>→ അഡ്‌മിഷൻ എടുക്കുകയും പിന്നീട് പഠനം നിൽത്തുകയും ചെയ്യുന്ന പക്ഷം ഫീസിൻ്റെ 75% മുതൽ 100% വരെ അടച്ചാൽ മാത്രമേ അഡ്‌മിഷൻ ക്യാൻസൽ ലെറ്റർ, രജിസ്ട്രേഷൻ ഡീറ്റൈൽസ്, ഡോക്യുമെൻ്റ്സ് തിരിച്ചു നൽകുകയുള്ളൂ.</p>
+                        <p>→ ക്ലാസിൽ അവധിയെടുക്കുന്നതിന് രക്ഷിതാവിൻ്റെയോ ഗാർഡിയൻ്റേയോ സമ്മതം അനിവാന്യമാണ്. മാത്രമല്ല, അക്കാദമിക് ഹെഡിനെ അവധി വിവരം അറിയിച്ചിരിക്കണം. ക്ലാസ് attend ചെയ്യേണ്ടത് നിങ്ങളുടെ ഉത്തരവാദിത്വമാണ്. റെഗുലറായി നിങ്ങൾക്കുള്ള ക്ലാസുകൾ ഞങ്ങൾ നൽകുന്നതാണ്.</p>
+                        <p>→ സ്ഥാപനത്തിൽ അടച്ച തുക യാതൊരു കാരണവശാലും തിരിച്ച് നൽകുന്നതല്ല.</p>
+                        <p>→ സ്ഥാപനത്തിൽ അടച്ച തുകയുടെ റസീപ്റ്റ് നിങ്ങളുടെ മെയിലിൽ വരുന്നതായിരിക്കും. ബാലൻസ് തുകയും അടക്കേണ്ട തിയ്യതിയും അതിൽ രേഖപ്പെടുത്തിയിരിക്കും.</p>
+                        <p>→ സ്ഥാപനത്തിൽ അടക്കുന്ന തുക payment App വഴി account transfer ചെയ്യുമ്പോൾ  Add noteൽ നിങ്ങളുടെ പേര്, കോഴ്‌സ്‌ എന്നിവ രേഖപ്പെടുത്തിയതോടൊപ്പം Screenshot എടുത്ത് അക്കാദമിക് ഹെഡിന് അയച്ച് കൊടുക്കുകയും ചെയ്യേണ്ടതാണ്. അല്ലാത്ത പക്ഷം payment തുക അസാധുവാകുന്നതായിരിക്കും.</p>
+                        <p>→ അഡ്‌മിഷൻ എടുത്ത സമയത്ത് തന്നെ നിങ്ങളെ ഗ്രൂപ്പുകളിൽ Add ചെയ്യും. ഗ്രൂപ്പുകളിൽ നിന്ന് Data [Notes, Voice notes] പ്രധാനപ്പെട്ട സന്ദേശങ്ങൾ നഷ്‌ടപെടാതെ ശ്രദ്ധിക്കുകയും ചെയ്യുക.</p>
+                        <p>→ അഡ്‌മിഷൻ എടുക്കുന്നത് ഏത് batchലേക്കാണോ ആ ബാച്ചിൽ ക്ലാസ് അറ്റൻഡ് ചെയ്യുകയും നിങ്ങളുടെ വ്യക്തിപരമായ കാരണങ്ങളാൽ പരീക്ഷ എഴുതാതിരിക്കുകയും ചെയ്‌താൽ ഈ ബാച്ചിൽ അടക്കേണ്ട tuition ഫീസിന് പുറമെ അടുത്ത ബാച്ചിൻ്റെ ക്ലാസിൽ ജോയിൻ ചെയ്യണമെങ്കിൽ പുതിയ ബാച്ചിന് tuition ഫീ മുഴുവനായും അടക്കേണ്ടി വരും.</p>
+
+                        <br />
+                        <p>സ്ഥാപനത്തിൻ്റെ നിയമങ്ങൾ പൂർണ്ണമായി- പാലിച്ചുകൊണ്ടും മുകളിൽ പറഞ്ഞ terms and conditions അംഗീകരിച്ചുകൊണ്ടും ഞാൻ പഠനം പൂർത്തിയാക്കുമെന്ന് ഉറപ്പ് നൽകുന്നു.</p>
+                      </div>
+
                     </div>
                     <div class="signature">
                       <p>Warm regards,</p>
@@ -359,8 +418,6 @@ const createNewTransaction = async (
   admissionNumber,
   utrNumber
 ) => {
-  console.log(`Printing the values assosiated with transactions..`);
-  console.log(utrNumber);
 
   try {
     const transaction = new Transaction({
@@ -421,7 +478,7 @@ const createNiosStudent = asyncHandler(async (req, res) => {
     const niosFee = await NiosFee.findOne(query);
 
     if (niosFee) {
-      const { installments, totalAmount, admissionFees, admissionFeeDueDate } =
+      const { installments, totalAmount, admissionFees, admissionFeeDueDate, examFeeDueDate, registrationFeeDueDate } =
         niosFee;
 
       // Generate admission number (e.g., starting from 1001)
@@ -456,6 +513,8 @@ const createNiosStudent = asyncHandler(async (req, res) => {
           paidAmount: admissionFee,
           admissionFees,
           admissionFeeDueDate,
+          examFeeDueDate, //error is in this line of code
+          registrationFeeDueDate,
           installments,
         },
       };
@@ -487,7 +546,41 @@ const createNiosStudent = asyncHandler(async (req, res) => {
             utrNumber
           );
 
-          console.log('hi');
+          const getDates = (data) => {
+            const dateObject = new Date(data);
+            const day = dateObject.getUTCDate().toString().padStart(2, '0');
+            const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0'); // Month is zero-based
+            const year = dateObject.getUTCFullYear();
+            return `${day}-${month}-${year}`;
+          };
+
+          const examFeeDueDate = studentQuery.feeDetails.examFeeDueDate
+          const admissionFeeDueDate = studentQuery.feeDetails.admissionFeeDueDate
+          const registrationFeeDueDate = studentQuery.feeDetails.registrationFeeDueDate
+
+          const formattedExamFeeDueDate = getDates(examFeeDueDate);
+          const formattedAdmissionFeeDueDate = getDates(admissionFeeDueDate);
+          const formattedRegistrationFeeDueDate = getDates(registrationFeeDueDate);
+
+              await buildPdf(
+                name,
+                course,
+                studentQuery.batch && studentQuery.batch,
+                phoneNumber,
+                email,
+                studentQuery.intake,
+                studentQuery.feeDetails.admissionFees,
+                studentQuery.feeDetails.examFees = 'NA',
+                formattedExamFeeDueDate,
+                'Paid',
+                studentQuery.feeDetails.installments,
+                'NA',
+                formattedRegistrationFeeDueDate,
+                studentQuery.feeDetails.totalAmount,
+                studentQuery.feeDetails.paidAmount,
+                studentQuery.admissionNumber,
+                studentQuery.mode,
+              );
 
           // Send response with the created student
           res.status(201).send(niosStudent);
@@ -506,6 +599,48 @@ const createNiosStudent = asyncHandler(async (req, res) => {
             niosStudent.admissionNumber,
             utrNumber
           );
+
+          const getDates = (data) => {
+            const dateObject = new Date(data);
+            const day = dateObject.getUTCDate().toString().padStart(2, '0');
+            const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0'); // Month is zero-based
+            const year = dateObject.getUTCFullYear();
+            return `${day}-${month}-${year}`;
+          };
+
+          const examFeeDueDate = studentQuery.feeDetails.examFeeDueDate
+          const admissionFeeDueDate = studentQuery.feeDetails.admissionFeeDueDate
+          const registrationFeeDueDate = studentQuery.feeDetails.registrationFeeDueDate
+
+          const formattedExamFeeDueDate = getDates(examFeeDueDate);
+          const formattedAdmissionFeeDueDate = getDates(admissionFeeDueDate);
+          const formattedRegistrationFeeDueDate = getDates(registrationFeeDueDate);
+
+          //fixing the bugs with dates
+          console.log(admissionFeeDueDate)     
+          console.log(formattedAdmissionFeeDueDate)     
+
+          await buildPdf(
+            name,
+            course,
+            studentQuery.batch && studentQuery.batch,
+            phoneNumber,
+            email,
+            studentQuery.intake,
+            studentQuery.feeDetails.admissionFees - admissionFee,
+            studentQuery.feeDetails.examFees = 'NA',
+            formattedExamFeeDueDate,
+            formattedAdmissionFeeDueDate,
+            studentQuery.feeDetails.installments,
+            // studentQuery.feeDetails.registrationFees = 'NA',
+            // studentQuery.feeDetails.registrationFeeDueDate ,
+            'NA', // Formatted date
+            formattedRegistrationFeeDueDate,
+            studentQuery.feeDetails.totalAmount,
+            studentQuery.feeDetails.paidAmount,
+            studentQuery.admissionNumber,
+            studentQuery.mode
+        );
 
           console.log('hello');
 
@@ -794,7 +929,7 @@ const niosFeePay = asyncHandler(async (req, res) => {
 
   } else {
     // Extract the student's details
-    const { intake, course, batch, year, mode } = student;
+    let { intake, course, batch, year, mode } = student;
 
     // Determine the appropriate fees based on student's details
     const feeQuery = {
@@ -804,9 +939,15 @@ const niosFeePay = asyncHandler(async (req, res) => {
       mode,
     };
 
+    if(course === 'SSLC') {
+      batch = undefined
+    }
+
     if (batch !== undefined && batch !== null && batch !== '') {
       feeQuery.batch = batch;
     }
+
+    console.log(feeQuery)
 
     const niosFee = await NiosFee.findOne(feeQuery);
 

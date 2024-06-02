@@ -53,6 +53,8 @@ const getTotalExpenses = asyncHandler(async (req, res) => {
       },
     ]);
 
+    console.log(`printing the total expenses`)
+
     // Extract total expenses from the aggregation result
     const total = totalExpenses.length > 0 ? totalExpenses[0].total : 0;
 
