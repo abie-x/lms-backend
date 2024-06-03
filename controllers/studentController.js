@@ -110,7 +110,7 @@ async function buildPdf(
     // doc.text('Payment ID', 450, tableY, { align: 'left' });
 
     doc.text('Fee Type', 50, tableY);
-    doc.text('Outstanding Amount', 275, tableY);
+    doc.text('Amount', 275, tableY);
     doc.text('Due date', 370, tableY);
 
     doc.fillColor('black');

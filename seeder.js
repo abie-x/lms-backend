@@ -4,6 +4,7 @@ import colors from 'colors'
 import { NiosStudent } from './models/studentModel.js'
 import { testNiosStudents } from './data/niosStudents.js'
 import { NiosFee } from './models/feeModel.js'
+import Expense from './models/expenseModel.js'
 import { testFeeData } from './data/feeData.js'
 import { testTeachers } from './data/teachers.js'
 import { Teacher } from './models/teacherModel.js'
@@ -37,6 +38,7 @@ const destroyData = async () => {
     await NiosFee.deleteMany()
     await Transaction.deleteMany()
     await NiosStudent.deleteMany()
+    await Expense.deleteMany()
 
     console.log('Data Destroyed!'.red.inverse)
     process.exit()
