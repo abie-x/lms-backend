@@ -26,6 +26,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use('/temp', (req, res) => res.send('deploy successful'));
+
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/course', courseRoutes);
